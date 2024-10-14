@@ -1,0 +1,13 @@
+# IDE Configuration
+.vscode/
+*.user
+
+# Doc generation
+html/
+latex/
+
+# Binaries
+build/
+
+# Auto generated files
+qtavplayer_global.h
