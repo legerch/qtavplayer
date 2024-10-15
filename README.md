@@ -1,67 +1,96 @@
-_TODO: simple project description_
+Library fork used to provide an _advanced Qt Media Player_ based on [FFmpeg][ffmpeg-home] library.
 
 > [!NOTE]
-> TODO: add commit related source files
+> I'm not the original author of this library, this repository is only a fork from [QtAvPlayer][qtavplayer-repo]
 
 **Table of contents :**
-- [1. Requirements](#1-requirements)
-  - [1.1. C++ Standards](#11-c-standards)
-  - [1.2. Dependencies](#12-dependencies)
-- [2. How to build](#2-how-to-build)
-- [3. How to use](#3-how-to-use)
-- [4. Library details](#4-library-details)
-- [6. License](#6-license)
+- [1. Fork details](#1-fork-details)
+  - [1.1. Purposes](#11-purposes)
+  - [1.2. Original files sources](#12-original-files-sources)
+  - [1.3. Compatibility](#13-compatibility)
+- [2. Requirements](#2-requirements)
+  - [2.1. C++ Standards](#21-c-standards)
+  - [2.2. Dependencies](#22-dependencies)
+- [3. How to build](#3-how-to-build)
+- [4. License](#4-license)
 
-# 1. Requirements
-## 1.1. C++ Standards
+# 1. Fork details
+## 1.1. Purposes
+
+Original library was hard to build due to:
+- Usage of _Qt private headers_ (which heavily depends on how Qt was installed and the version used)
+- Some _CMake hacks_ (source directory had to be set manually, some directories where includes and exported when building target)
+
+So this fork aim to mainly fix those issues (and try some "workaround" to later propose a pull request to the original repository)
+
+> [!TIP]
+> See [changelog][repo-changelog] for more details
+
+## 1.2. Original files sources
+
+Below, current associated source files of this fork repository:
+
+| QtAvPlayer | Qt internal files |
+|:-:|:-:|
+| [7b24bd1c278a264df9121b27980decabea684716](https://github.com/valbok/QtAVPlayer/commit/7b24bd1c278a264df9121b27980decabea684716) | [Qt 6.7.2](https://github.com/qt/qtmultimedia/tree/6.7.2/src/multimedia/video) |
+
+## 1.3. Compatibility
+
+Those symbols will be used:
+- :dizzy:: Untested
+- :x:: Not working
+- :heavy_check_mark:: Tested and working
+
+| / | Qt `5.12 -> 5.15.2` | Qt `6.0 -> 6.8` | Comments |
+|:-:|:-:|:-:|:-:|
+| Linux (Ubuntu) | :dizzy: | :heavy_check_mark: | HW accelerated feature currently **not supported** |
+| Windows | :dizzy: | :dizzy: | / |
+| Apple | :dizzy: | :dizzy: | / |
+| Android | :dizzy: | :dizzy: | / |
+ 
+# 2. Requirements
+## 2.1. C++ Standards
 
 This library requires at least **C++ 11** standard
 
-## 1.2. Dependencies
+## 2.2. Dependencies
 
 Below, list of required dependencies:
 
 | Dependencies | VCPKG package | Comments |
 |:-:|:-:|:-:|
 | [Qt][qt-official] | / | Library built with **Qt framework** |
-| [Google Tests][gtest-repo] | `gtest` | Only needed to run unit-tests |
+| [FFmpeg][ffmpeg-home] | `ffmpeg` | / |
 
 > Dependency manager [VCPKG][vcpkg-tutorial] is not mandatory, this is only a note to be able to list needed packages
 
-# 2. How to build
+# 3. How to build
 
 This library can be use as an _embedded library_ in a subdirectory of your project (like a _git submodule_ for example) :
 1. In the **root** CMakeLists, add instructions :
 ```cmake
-add_subdirectory(MyLibrary) # Or if library is put in a folder "dependencies" : add_subdirectory(dependencies/MyLibrary)
+add_subdirectory(qtavplayer) # Or if library is put in a folder "dependencies" : add_subdirectory(dependencies/qtavplayer)
 ```
 
 1. In the **application/library** CMakeLists, add instructions :
 ```cmake
 # Link needed libraries
-target_link_libraries(${PROJECT_NAME} PRIVATE mylibrary)
+target_link_libraries(${PROJECT_NAME} PRIVATE qtavplayer)
 ```
 
-# 3. How to use
+# 4. License
 
-_TODO: Describe how to use library_
-
-# 4. Library details
-
-_TODO: Sections that can be described are: implementation/tips and tricks/alternatives_
-
-# 6. License
-
-This library is licensed under [MIT license][repo-license].
-_TODO: give more details about original project, this is a FORK project_
+[QtAvPlayer][qtavplayer-repo] library is released under [MIT License][repo-license], so this library too.
 
 <!-- Links of this repository -->
-[repo-license]: LICENSE
+[repo-changelog]: CHANGELOG.md
+[repo-license]: LICENSE.md
 
 <!-- External links -->
 [doxygen-official]: https://www.doxygen.nl/index.html
-[example-doc-web]: https://www.google.com/
+[ffmpeg-home]: https://www.ffmpeg.org/
 [gtest-repo]: https://github.com/google/googletest
+[qtavplayer-repo]: https://github.com/valbok/QtAVPlayer
 
 [qt-official]: https://www.qt.io/
 [qt-installer]: https://www.qt.io/download-qt-installer
