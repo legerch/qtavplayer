@@ -15,8 +15,8 @@
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 #include <QAbstractVideoSurface>
 #else
-#include <QtMultimedia/private/qabstractvideobuffer_p.h>
-#include <QtMultimedia/private/qvideotexturehelper_p.h>
+#include <qt_internal/qabstractvideobuffer_p.h>
+#include <qt_internal/qvideotexturehelper_p.h>
 #endif
 #endif
 #include <QDebug>
