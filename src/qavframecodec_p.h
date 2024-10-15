@@ -19,7 +19,6 @@
 // We mean it.
 //
 
-#include "qavframe.h"
 #include "qavcodec_p.h"
 #include "qavpacket_p.h"
 

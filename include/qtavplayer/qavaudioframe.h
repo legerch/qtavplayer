@@ -8,8 +8,8 @@
 #ifndef QAVFAUDIORAME_H
 #define QAVFAUDIORAME_H
 
-#include <QtAVPlayer/qavframe.h>
-#include <QtAVPlayer/qavaudioformat.h>
+#include <qtavplayer/qavframe.h>
+#include <qtavplayer/qavaudioformat.h>
 
 QT_BEGIN_NAMESPACE
 

@@ -19,7 +19,7 @@
 // We mean it.
 //
 
-#include <QtAVPlayer/qtavplayerglobal.h>
+#include <qtavplayer/qtavplayer_global.h>
 #include <memory>
 
 QT_BEGIN_NAMESPACE

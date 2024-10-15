@@ -20,9 +20,9 @@
 //
 
 #include "qavpacket_p.h"
-#include "qavstream.h"
-#include "qavframe.h"
-#include "qavsubtitleframe.h"
+#include "qtavplayer/qavstream.h"
+#include "qtavplayer/qavframe.h"
+#include "qtavplayer/qavsubtitleframe.h"
 #include <QMap>
 #include <memory>
 

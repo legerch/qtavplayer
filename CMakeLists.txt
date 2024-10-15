@@ -41,8 +41,8 @@ message(STATUS "Project \"${PROJECT_NAME}\" compiled with C++ standard ${CMAKE_C
 
 # Set needed packages
 ## Qt packages
-find_package(QT NAMES Qt6 Qt5 COMPONENTS Core REQUIRED)
-find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core REQUIRED)
+find_package(QT NAMES Qt6 Qt5 COMPONENTS Core Gui Multimedia REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core Gui Multimedia REQUIRED)
 
 ## Other library packages
 ### Example: find_package(nlohmann_json 3.11.3 REQUIRED)
@@ -183,7 +183,16 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 
 # Link needed libraries
 ## Qt linking
-target_link_libraries(${PROJECT_NAME} PRIVATE Qt${QT_VERSION_MAJOR}::Core)
+target_link_libraries(${PROJECT_NAME} PRIVATE
+    Qt${QT_VERSION_MAJOR}::Core
+    Qt${QT_VERSION_MAJOR}::Gui
+    Qt${QT_VERSION_MAJOR}::GuiPrivate
+    Qt${QT_VERSION_MAJOR}::Multimedia
+)
+
+## FFMPEG linking
+target_link_directories(${PROJECT_NAME} PRIVATE ${FFMPEG_LIBRARY_DIRS})
+target_link_libraries(${PROJECT_NAME} PRIVATE ${FFMPEG_LIBRARIES})
 
 ## Other library linking
 ### Example: target_link_libraries(${PROJECT_NAME} PRIVATE nlohmann_json::nlohmann_json)
@@ -211,4 +220,10 @@ target_include_directories(${PROJECT_NAME}
         ${PROJECT_DIR_PUBLIC_HEADERS_ROOT}  # Only expose public headers
     PRIVATE
         ${PROJECT_DIR_PRIV_SOURCES}         # Internal headers, only for internal use
+        ${FFMPEG_INCLUDE_DIRS}              # Needed for FFMPEG library
 )
+
+# Add linker specific flags due to FFMPEG.
+# For more details, please refer to:
+# https://github.com/microsoft/vcpkg/issues/31185
+set(CMAKE_SHARED_LINKER_FLAGS "-Wl,-Bsymbolic")

@@ -8,7 +8,7 @@
 #include "qavaudiofilter_p.h"
 #include "qavfilter_p_p.h"
 #include "qavcodec_p.h"
-#include "qavstream.h"
+#include "qtavplayer/qavstream.h"
 #include <QDebug>
 
 extern "C" {

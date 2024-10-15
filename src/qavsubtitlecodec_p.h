@@ -19,7 +19,7 @@
 // We mean it.
 //
 
-#include "qavsubtitleframe.h"
+#include "qtavplayer/qavsubtitleframe.h"
 #include "qavcodec_p.h"
 #include "qavpacket_p.h"
 

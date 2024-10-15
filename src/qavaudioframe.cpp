@@ -5,7 +5,7 @@
  * Free Qt Media Player based on FFmpeg.                 *
  *********************************************************/
 
-#include "qavaudioframe.h"
+#include "qtavplayer/qavaudioframe.h"
 #include "qavframe_p.h"
 #include "qavaudiocodec_p.h"
 #include <QDebug>

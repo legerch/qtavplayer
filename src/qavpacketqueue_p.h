@@ -22,9 +22,9 @@
 #include "qavpacket_p.h"
 #include "qavfilter_p.h"
 #include "qavfiltergraph_p.h"
-#include "qavframe.h"
-#include "qavsubtitleframe.h"
-#include "qavstreamframe.h"
+#include "qtavplayer/qavframe.h"
+#include "qtavplayer/qavsubtitleframe.h"
+#include "qtavplayer/qavstreamframe.h"
 #include "qavdemuxer_p.h"
 #include <QMutex>
 #include <QWaitCondition>

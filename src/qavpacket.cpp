@@ -7,7 +7,7 @@
 
 #include "qavpacket_p.h"
 #include "qavcodec_p.h"
-#include "qavstream.h"
+#include "qtavplayer/qavstream.h"
 #include <QSharedPointer>
 #include <QDebug>
 

@@ -8,7 +8,7 @@
 #ifndef QAVSTREAM_H
 #define QAVSTREAM_H
 
-#include <QtAVPlayer/qtavplayerglobal.h>
+#include <qtavplayer/qtavplayer_global.h>
 #include <QMap>
 #include <QSharedPointer>
 #include <memory>

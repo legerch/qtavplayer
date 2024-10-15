@@ -9,8 +9,8 @@
 #include "qavhwdevice_p.h"
 #include "qavcodec_p_p.h"
 #include "qavpacket_p.h"
-#include "qavframe.h"
-#include "qavvideoframe.h"
+#include "qtavplayer/qavframe.h"
+#include "qtavplayer/qavvideoframe.h"
 #include <QDebug>
 
 extern "C" {

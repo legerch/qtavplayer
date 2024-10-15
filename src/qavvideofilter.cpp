@@ -8,8 +8,8 @@
 #include "qavvideofilter_p.h"
 #include "qavfilter_p_p.h"
 #include "qavcodec_p.h"
-#include "qavvideoframe.h"
-#include "qavstream.h"
+#include "qtavplayer/qavvideoframe.h"
+#include "qtavplayer/qavstream.h"
 #include <QDebug>
 
 extern "C" {
