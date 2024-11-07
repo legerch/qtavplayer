@@ -210,7 +210,7 @@ target_compile_options(${PROJECT_NAME} PRIVATE
 # Compile needed definitions
 ## Library related
 target_compile_definitions(${PROJECT_NAME} PRIVATE QTAVPLAYER_LIBRARY_BUILD)
-target_compile_definitions(${PROJECT_NAME} PRIVATE QT_AVPLAYER_MULTIMEDIA)
+target_compile_definitions(${PROJECT_NAME} PUBLIC QT_AVPLAYER_MULTIMEDIA)
 
 ## Platform dependant
 if(WIN32)
