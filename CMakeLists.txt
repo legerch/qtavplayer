@@ -18,7 +18,12 @@ set(CMAKE_AUTORCC ON)
 # Define project options
 ## Example: option(LIBRARYNAME_BUILD_TESTS "Use to enable/disable build of unit-tests." ON)
 option(QTAVPLAYER_MULTIMEDIA "Use to enable/disable QtMultimedia support" ON)
-option(QTAVPLAYER_HW_SUPPORT "Use to enable/disable hardware accelerated support" OFF)
+
+option(QTAVPLAYER_HW_SUPPORT_WINDOWS        "Use to enable/disable hardware accelerated support for Windows" ON)
+option(QTAVPLAYER_HW_SUPPORT_MACOS          "Use to enable/disable hardware accelerated support for MacOS" ON)
+option(QTAVPLAYER_HW_SUPPORT_LINUX_WAYLAND  "Use to enable/disable hardware accelerated support for Linux Wayland" ON)
+option(QTAVPLAYER_HW_SUPPORT_ANDROID        "Use to enable/disable hardware accelerated support for Android" ON)
+option(QTAVPLAYER_HW_SUPPORT_IOS            "Use to enable/disable hardware accelerated support for iOS" ON)
 
 # Where to export generated binaries
 if(NOT PROJECT_BUILD_OUTPUT)
@@ -166,33 +171,10 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     set(PROJECT_DEF_PRIV ${PROJECT_DEF_PRIV}
         "NOMINMAX"  # Needed because Windows define macros "min/max", better to not defined those and use "std::min/std::max" instead
     )
-endif()
 
-# Manage accelerated hardware support
-if(QTAVPLAYER_HW_SUPPORT)
-    message(STATUS "Project \"${PROJECT_NAME}\" have enabled accelerated hardware support for \"${CMAKE_SYSTEM_NAME}\" systems")
+    if(QTAVPLAYER_HW_SUPPORT_WINDOWS)
+        message(STATUS "Project \"${PROJECT_NAME}\" have enabled accelerated hardware support for \"Windows\" systems")
 
-    if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-        set(PROJECT_HEADERS_PRIVATE ${PROJECT_HEADERS_PRIVATE}
-            qavhwdevice_vaapi_drm_egl_p.h
-        )
-
-        set(PROJECT_SOURCES ${PROJECT_SOURCES}
-            qavhwdevice_vaapi_drm_egl.cpp
-        )
-
-        set(PROJECT_DEF_PRIV ${PROJECT_DEF_PRIV}
-            "QT_AVPLAYER_VA_DRM"
-        )
-
-        set(PROJECT_LINKING_LIB ${PROJECT_LINKING_LIB}
-            EGL
-            va      #libva
-            va-drm
-        )
-    endif()
-
-    if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
         set(PROJECT_HEADERS_PRIVATE ${PROJECT_HEADERS_PRIVATE}
             qavhwdevice_d3d11_p.h
         )
@@ -201,19 +183,45 @@ if(QTAVPLAYER_HW_SUPPORT)
             qavhwdevice_d3d11.cpp
         )
     endif()
+endif()
 
-    if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
-        set(PROJECT_SOURCES ${PROJECT_SOURCES}
-            qavhwdevice_videotoolbox.mm
-        )
-    endif()
+if((CMAKE_SYSTEM_NAME STREQUAL "Darwin" AND QTAVPLAYER_HW_SUPPORT_MACOS) OR (CMAKE_SYSTEM_NAME STREQUAL "iOS" AND QTAVPLAYER_HW_SUPPORT_IOS))
+    message(STATUS "Project \"${PROJECT_NAME}\" have enabled accelerated hardware support for \"Apple\" systems")
 
-    if(CMAKE_SYSTEM_NAME STREQUAL "Android")
-        set(PROJECT_SOURCES ${PROJECT_SOURCES}
-            qavhwdevice_mediacodec.cpp
-            qavandroidsurfacetexture.cpp
-        )
-    endif()
+    set(PROJECT_SOURCES ${PROJECT_SOURCES}
+        qavhwdevice_videotoolbox.mm
+    )
+endif()
+
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND QTAVPLAYER_HW_SUPPORT_LINUX_WAYLAND)
+    message(STATUS "Project \"${PROJECT_NAME}\" have enabled accelerated hardware support for \"Linux Wayland\" systems")
+
+    set(PROJECT_HEADERS_PRIVATE ${PROJECT_HEADERS_PRIVATE}
+        qavhwdevice_vaapi_drm_egl_p.h
+    )
+
+    set(PROJECT_SOURCES ${PROJECT_SOURCES}
+        qavhwdevice_vaapi_drm_egl.cpp
+    )
+
+    set(PROJECT_DEF_PRIV ${PROJECT_DEF_PRIV}
+        "QT_AVPLAYER_VA_DRM"
+    )
+
+    set(PROJECT_LINKING_LIB ${PROJECT_LINKING_LIB}
+        EGL
+        va      #libva
+        va-drm
+    )
+endif()
+
+if(CMAKE_SYSTEM_NAME STREQUAL "Android" AND QTAVPLAYER_HW_SUPPORT_ANDROID)
+    message(STATUS "Project \"${PROJECT_NAME}\" have enabled accelerated hardware support for \"Android\" systems")
+
+    set(PROJECT_SOURCES ${PROJECT_SOURCES}
+        qavhwdevice_mediacodec.cpp
+        qavandroidsurfacetexture.cpp
+    )
 endif()
 
 ### Prepend all files to proper directory

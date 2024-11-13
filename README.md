@@ -45,10 +45,11 @@ Those symbols will be used:
 - :heavy_check_mark:: Tested and working
 
 | / | Qt `5.12 -> 5.15.2` | Qt `6.0 -> 6.8` | HW accelerated feature | Comments |
-|:-:|:-:|:-:|:-:|:-:|
+|:-:|:-:|:-:|:-:|:-|
 | Linux (Ubuntu) | :heavy_check_mark: | :heavy_check_mark: | :last_quarter_moon: | HW support:<br>- **Wayland** supported (require packages: `libva-dev`)<br>- **X11** unsupported |
 | Windows | :dizzy: | :dizzy: | :dizzy: | / |
-| Apple | :dizzy: | :dizzy: | :dizzy: | / |
+| MacOS | :dizzy: | :dizzy: | :dizzy: | / |
+| iOS | :dizzy: | :dizzy: | :dizzy: | / |
 | Android | :dizzy: | :dizzy: | :dizzy: | / |
  
 # 2. Requirements
@@ -85,7 +86,12 @@ target_link_libraries(${PROJECT_NAME} PRIVATE qtavplayer)
 
 This library provide some **CMake** options:
 - `QTAVPLAYER_MULTIMEDIA`: Use to enable/disable _QtMultimedia_ support. **Default value:** `ON`.
-- `QTAVPLAYER_HW_SUPPORT`: Use to enable/disable hardware accelerated support. **Default value:** `OFF`.
+- Enable/disable hardware accelerated support for each supported OS without having to check current platform build (if disabled, software decoding will be used):
+  - `QTAVPLAYER_HW_SUPPORT_WINDOWS`: Support for **Windows** using _D3D11_ API. **Default value:** `ON`.
+  - `QTAVPLAYER_HW_SUPPORT_MACOS`: Support for **MacOs** using _Metal_ API. **Default value:** `ON`.
+  - `QTAVPLAYER_HW_SUPPORT_LINUX_WAYLAND`: Support for **Linux Wayland** systems using _libva-drm_ API. **Default value:** `ON`.
+  - `QTAVPLAYER_HW_SUPPORT_ANDROID`: Support for **Android** using _MediaCodec_ API. **Default value:** `ON`.
+  - `QTAVPLAYER_HW_SUPPORT_IOS`: Support for **iOS** using _Metal_ API. **Default value:** `ON`.
 
 # 4. License
 
