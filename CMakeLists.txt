@@ -17,6 +17,8 @@ set(CMAKE_AUTORCC ON)
 
 # Define project options
 ## Example: option(LIBRARYNAME_BUILD_TESTS "Use to enable/disable build of unit-tests." ON)
+option(QTAVPLAYER_MULTIMEDIA "Use to enable/disable QtMultimedia support" ON)
+option(QTAVPLAYER_HW_SUPPORT "Use to enable/disable hardware accelerated support" OFF)
 
 # Where to export generated binaries
 if(NOT PROJECT_BUILD_OUTPUT)
@@ -57,6 +59,23 @@ set(PROJECT_FILE_GLOBAL             "${PROJECT_DIR_PUBLIC_HEADERS}/qtavplayer_gl
 # Manage library files
 ## Configure file project - File containing macros that can be used in project
 configure_file("${PROJECT_FILE_GLOBAL}.in" "${PROJECT_FILE_GLOBAL}")
+
+## Set library compilation definitions
+set(PROJECT_DEF_PRIV
+    "QTAVPLAYER_LIBRARY_BUILD"
+)
+
+## Set library linking
+set(PROJECT_LINKING_LIB
+    ### Qt related
+    Qt${QT_VERSION_MAJOR}::Core
+    Qt${QT_VERSION_MAJOR}::Gui
+    Qt${QT_VERSION_MAJOR}::GuiPrivate
+    Qt${QT_VERSION_MAJOR}::Multimedia
+
+    ### FFMPEG related
+    ${FFMPEG_LIBRARIES}
+)
 
 ## Set library files
 ### Public interface
@@ -141,32 +160,60 @@ set(PROJECT_SOURCES
     qavfilters.cpp
 )
 
-### Manage platform differences
-if(WIN32)
-    set(PROJECT_HEADERS_PRIVATE
-        ${PROJECT_HEADERS_PRIVATE}
-        qavhwdevice_d3d11_p.h
-    )
-
-    set(PROJECT_SOURCES
-        ${PROJECT_SOURCES}
-        qavhwdevice_d3d11.cpp
+# Manage platform differences
+## Refer to: https://cmake.org/cmake/help/latest/variable/CMAKE_SYSTEM_NAME.html
+if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+    set(PROJECT_DEF_PRIV ${PROJECT_DEF_PRIV}
+        "NOMINMAX"  # Needed because Windows define macros "min/max", better to not defined those and use "std::min/std::max" instead
     )
 endif()
 
-if(APPLE)
-    set(PROJECT_SOURCES
-        ${PROJECT_SOURCES}
-        qavhwdevice_videotoolbox.mm
-    )
-endif()
+# Manage accelerated hardware support
+if(QTAVPLAYER_HW_SUPPORT)
+    message(STATUS "Project \"${PROJECT_NAME}\" have enabled accelerated hardware support for \"${CMAKE_SYSTEM_NAME}\" systems")
 
-if(ANDROID)
-    set(PROJECT_SOURCES
-        ${PROJECT_SOURCES}
-        qavhwdevice_mediacodec.cpp
-        qavandroidsurfacetexture.cpp
-    )
+    if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+        set(PROJECT_HEADERS_PRIVATE ${PROJECT_HEADERS_PRIVATE}
+            qavhwdevice_vaapi_drm_egl_p.h
+        )
+
+        set(PROJECT_SOURCES ${PROJECT_SOURCES}
+            qavhwdevice_vaapi_drm_egl.cpp
+        )
+
+        set(PROJECT_DEF_PRIV ${PROJECT_DEF_PRIV}
+            "QT_AVPLAYER_VA_DRM"
+        )
+
+        set(PROJECT_LINKING_LIB ${PROJECT_LINKING_LIB}
+            EGL
+            va      #libva
+            va-drm
+        )
+    endif()
+
+    if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+        set(PROJECT_HEADERS_PRIVATE ${PROJECT_HEADERS_PRIVATE}
+            qavhwdevice_d3d11_p.h
+        )
+
+        set(PROJECT_SOURCES ${PROJECT_SOURCES}
+            qavhwdevice_d3d11.cpp
+        )
+    endif()
+
+    if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+        set(PROJECT_SOURCES ${PROJECT_SOURCES}
+            qavhwdevice_videotoolbox.mm
+        )
+    endif()
+
+    if(CMAKE_SYSTEM_NAME STREQUAL "Android")
+        set(PROJECT_SOURCES ${PROJECT_SOURCES}
+            qavhwdevice_mediacodec.cpp
+            qavandroidsurfacetexture.cpp
+        )
+    endif()
 endif()
 
 ### Prepend all files to proper directory
@@ -185,20 +232,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
                         SOVERSION ${PROJECT_VERSION_MAJOR})
 
 # Link needed libraries
-## Qt linking
-target_link_libraries(${PROJECT_NAME} PRIVATE
-    Qt${QT_VERSION_MAJOR}::Core
-    Qt${QT_VERSION_MAJOR}::Gui
-    Qt${QT_VERSION_MAJOR}::GuiPrivate
-    Qt${QT_VERSION_MAJOR}::Multimedia
-)
-
-## FFMPEG linking
-target_link_directories(${PROJECT_NAME} PRIVATE ${FFMPEG_LIBRARY_DIRS})
-target_link_libraries(${PROJECT_NAME} PRIVATE ${FFMPEG_LIBRARIES})
-
-## Other library linking
-### Example: target_link_libraries(${PROJECT_NAME} PRIVATE nlohmann_json::nlohmann_json)
+target_link_libraries(${PROJECT_NAME} PRIVATE ${PROJECT_LINKING_LIB})
 
 # Specify compiler options
 target_compile_options(${PROJECT_NAME} PRIVATE
@@ -209,12 +243,11 @@ target_compile_options(${PROJECT_NAME} PRIVATE
 
 # Compile needed definitions
 ## Library related
-target_compile_definitions(${PROJECT_NAME} PRIVATE QTAVPLAYER_LIBRARY_BUILD)
-target_compile_definitions(${PROJECT_NAME} PUBLIC QT_AVPLAYER_MULTIMEDIA)
+target_compile_definitions(${PROJECT_NAME} PRIVATE ${PROJECT_DEF_PRIV})
 
-## Platform dependant
-if(WIN32)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE NOMINMAX)    # Needed because Windows define macros "min/max", better to not defined those and use "std::min/std::max" instead
+## Do we need Qt Multimedia support
+if(QTAVPLAYER_MULTIMEDIA)
+    target_compile_definitions(${PROJECT_NAME} PUBLIC QT_AVPLAYER_MULTIMEDIA)
 endif()
 
 # Specify include directories
