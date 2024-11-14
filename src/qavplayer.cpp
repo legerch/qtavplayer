@@ -12,12 +12,8 @@
 
 #include "qavpacket_p.h"
 #include "qtavplayer/qaviodevice.h"
-#include "qavvideocodec_p.h"
-#include "qavaudiocodec_p.h"
 #include "qavpacketqueue_p.h"
 #include "qavfiltergraph_p.h"
-#include "qavvideofilter_p.h"
-#include "qavaudiofilter_p.h"
 #include "qavfilters_p.h"
 
 #include <QtConcurrent/qtconcurrentrun.h>
@@ -1315,45 +1311,24 @@ void QAVPlayer::setInputOptions(const QMap<QString, QString>  &opts)
     Q_EMIT inputOptionsChanged(opts);
 }
 
+/*!
+ * \brief Use to set log level of FFmpeg backend
+ * \param[in] level
+ * Level log to use. Please see:
+ * https://ffmpeg.org/doxygen/trunk/group__lavu__log__constants.html
+ * for value details
+ */
+void QAVPlayer::setLogsLevelBackend(int level)
+{
+    av_log_set_level(level);
+}
+
 QAVStream::Progress QAVPlayer::progress(const QAVStream &s) const
 {
     return d_func()->demuxer.progress(s);
 }
 
 #ifndef QT_NO_DEBUG_STREAM
-QDebug operator<<(QDebug dbg, QAVPlayer::State state)
-{
-    QDebugStateSaver saver(dbg);
-    dbg.nospace();
-    switch (state) {
-        case QAVPlayer::StoppedState:
-            return dbg << "StoppedState";
-        case QAVPlayer::PlayingState:
-            return dbg << "PlayingState";
-        case QAVPlayer::PausedState:
-            return dbg << "PausedState";
-        default:
-            return dbg << QString(QLatin1String("UserType(%1)" )).arg(int(state)).toLatin1().constData();
-    }
-}
-
-QDebug operator<<(QDebug dbg, QAVPlayer::MediaStatus status)
-{
-    QDebugStateSaver saver(dbg);
-    dbg.nospace();
-    switch (status) {
-        case QAVPlayer::NoMedia:
-            return dbg << "NoMedia";
-        case QAVPlayer::LoadedMedia:
-            return dbg << "LoadedMedia";
-        case QAVPlayer::EndOfMedia:
-            return dbg << "EndOfMedia";
-        case QAVPlayer::InvalidMedia:
-            return dbg << "InvalidMedia";
-        default:
-            return dbg << QString(QLatin1String("UserType(%1)" )).arg(int(status)).toLatin1().constData();
-    }
-}
 
 QDebug operator<<(QDebug dbg, PendingMediaStatus status)
 {
@@ -1379,21 +1354,6 @@ QDebug operator<<(QDebug dbg, PendingMediaStatus status)
     }
 }
 
-QDebug operator<<(QDebug dbg, QAVPlayer::Error err)
-{
-    QDebugStateSaver saver(dbg);
-    dbg.nospace();
-    switch (err) {
-        case QAVPlayer::NoError:
-            return dbg << "NoError";
-        case QAVPlayer::ResourceError:
-            return dbg << "ResourceError";
-        case QAVPlayer::FilterError:
-            return dbg << "FilterError";
-        default:
-            return dbg << QString(QLatin1String("UserType(%1)" )).arg(int(err)).toLatin1().constData();
-    }
-}
 #endif
 
 Q_DECLARE_METATYPE(PendingMediaStatus)

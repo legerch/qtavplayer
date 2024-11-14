@@ -23,9 +23,6 @@ class QAVPlayerPrivate;
 class QAVPlayer : public QObject
 {
     Q_OBJECT
-    Q_ENUMS(State)
-    Q_ENUMS(MediaStatus)
-    Q_ENUMS(Error)
 
 public:
     enum State
@@ -34,6 +31,7 @@ public:
         PlayingState,
         PausedState
     };
+    Q_ENUM(State)
 
     enum MediaStatus
     {
@@ -42,6 +40,7 @@ public:
         EndOfMedia,
         InvalidMedia
     };
+    Q_ENUM(MediaStatus)
 
     enum Error
     {
@@ -49,10 +48,13 @@ public:
         ResourceError,
         FilterError
     };
+    Q_ENUM(Error)
 
+public:
     QAVPlayer(QObject *parent = nullptr);
     ~QAVPlayer();
 
+public:
     void setSource(const QString &url, const QSharedPointer<QAVIODevice> &dev = {});
     QString source() const;
 
@@ -139,6 +141,9 @@ Q_SIGNALS:
     void audioFrame(const QAVAudioFrame &frame);
     void subtitleFrame(const QAVSubtitleFrame &frame);
 
+public:
+    static void setLogsLevelBackend(int level);
+
 protected:
     std::unique_ptr<QAVPlayerPrivate> d_ptr;
 
@@ -146,16 +151,6 @@ private:
     Q_DISABLE_COPY(QAVPlayer)
     Q_DECLARE_PRIVATE(QAVPlayer)
 };
-
-#ifndef QT_NO_DEBUG_STREAM
-QDebug operator<<(QDebug, QAVPlayer::State);
-QDebug operator<<(QDebug, QAVPlayer::MediaStatus);
-QDebug operator<<(QDebug, QAVPlayer::Error);
-#endif
-
-Q_DECLARE_METATYPE(QAVPlayer::State)
-Q_DECLARE_METATYPE(QAVPlayer::MediaStatus)
-Q_DECLARE_METATYPE(QAVPlayer::Error)
 
 QT_END_NAMESPACE
 
