@@ -34,7 +34,7 @@ Below, current associated source files of this fork repository:
 
 | QtAvPlayer | Qt internal files |
 |:-:|:-:|
-| [7b24bd1c278a264df9121b27980decabea684716](https://github.com/valbok/QtAVPlayer/commit/7b24bd1c278a264df9121b27980decabea684716) | [Qt 6.7.2](https://github.com/qt/qtmultimedia/tree/6.7.2/src/multimedia/video) |
+| [4d67bbc64d54084662edb5780f3d3f99031f2bd7](https://github.com/valbok/QtAVPlayer/commit/4d67bbc64d54084662edb5780f3d3f99031f2bd7) | [Qt 6.8.0](https://github.com/qt/qtmultimedia/tree/6.7.2/src/multimedia/video) |
 
 ## 1.3. Compatibility
 
@@ -45,7 +45,7 @@ Those symbols will be used:
 - :heavy_check_mark:: Tested and working
 
 | / | Qt `5.12 -> 5.15.2` | Qt `6.0 -> 6.8` | HW accelerated feature | Comments |
-|:-:|:-:|:-:|:-:|:-|
+|:-:|:-:|:-:|:-:|:-:|
 | Linux (Ubuntu) | :heavy_check_mark: | :heavy_check_mark: | :last_quarter_moon: | HW support:<br>- **Wayland** supported (require packages: `libva-dev`)<br>- **X11** unsupported |
 | Windows | :dizzy: | :dizzy: | :dizzy: | / |
 | MacOS | :dizzy: | :dizzy: | :dizzy: | / |

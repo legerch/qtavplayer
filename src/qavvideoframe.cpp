@@ -10,16 +10,23 @@
 #include "qavframe_p.h"
 #include "qavvideocodec_p.h"
 #include "qavhwdevice_p.h"
-#include <QSize>
-#ifdef QT_AVPLAYER_MULTIMEDIA
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-#include <QAbstractVideoSurface>
-#else
-#include <qt_internal/qabstractvideobuffer_p.h>
-#include <qt_internal/qvideotexturehelper_p.h>
-#endif
-#endif
+
 #include <QDebug>
+#include <QSize>
+
+#ifdef QT_AVPLAYER_MULTIMEDIA
+#   if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+#       include <QAbstractVideoSurface>
+#   else
+#       if QT_VERSION < QT_VERSION_CHECK(6, 8, 0)
+#           include <qt_internal/qabstractvideobuffer_p.h>
+#       else
+#           include <qt_internal/qhwvideobuffer_p.h>
+#       endif
+#       include <qt_internal/qvideotexturehelper_p.h>
+#   endif
+#endif
+
 
 extern "C" {
 #include <libswscale/swscale.h>
@@ -217,15 +224,24 @@ private:
     QAVVideoFrame m_frame;
     MapMode m_mode = NotMapped;
 };
+
+#else // #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+
+#if QT_VERSION < QT_VERSION_CHECK(6, 8, 0)
+using AbstractVideoBuffer = QAbstractVideoBuffer;
 #else
-class PlanarVideoBuffer : public QAbstractVideoBuffer
+using AbstractVideoBuffer = QHwVideoBuffer;
+#endif
+
+class PlanarVideoBuffer : public AbstractVideoBuffer
 {
 public:
     PlanarVideoBuffer(const QAVVideoFrame &frame, QVideoFrameFormat::PixelFormat format
-        , QVideoFrame::HandleType type = QVideoFrame::NoHandle)
-        : QAbstractVideoBuffer(type)
+        , QVideoFrame::HandleType type = QVideoFrame::NoHandle, QVideoFrameFormat videoFormat = {})
+        : AbstractVideoBuffer(type)
         , m_frame(frame)
         , m_pixelFormat(format)
+        , m_videoFormat(videoFormat)
     {
     }
 
@@ -233,8 +249,10 @@ public:
     QVideoFrame::MapMode mapMode() const override { return m_mode; }
 
     quint64 textureHandle(int plane) const override
+
 #else
     QVideoFrame::MapMode mapMode() const { return m_mode; }
+    QVideoFrameFormat format() const override { return m_videoFormat; }
 
     quint64 textureHandle(QRhi*, int plane) const override
 #endif
@@ -258,15 +276,27 @@ public:
         m_mode = mode;
         auto mapData = m_frame.map();
         auto *desc = QVideoTextureHelper::textureDescription(m_pixelFormat);
+
+#if QT_VERSION < QT_VERSION_CHECK(6, 8, 0)
         res.nPlanes = desc->nplanes;
-        for (int i = 0; i < res.nPlanes; ++i) {
+#else
+        res.planeCount = desc->nplanes;
+#endif
+
+        for (int i = 0; i < desc->nplanes; ++i) {
             if (!mapData.bytesPerLine[i])
                 break;
 
             res.data[i] = mapData.data[i];
             res.bytesPerLine[i] = mapData.bytesPerLine[i];
+
             // TODO: Reimplement heightForPlane
-            res.size[i] = mapData.bytesPerLine[i] * desc->heightForPlane(m_frame.size().height(), i);
+            auto size = mapData.bytesPerLine[i] * desc->heightForPlane(m_frame.size().height(), i);
+#if QT_VERSION < QT_VERSION_CHECK(6, 8, 0)
+            res.size[i] = size;
+#else
+            res.dataSize[i] = size;
+#endif
         }
         return res;
     }
@@ -372,6 +402,7 @@ public:
 private:
     QAVVideoFrame m_frame;
     QVideoFrameFormat::PixelFormat m_pixelFormat = QVideoFrameFormat::Format_Invalid;
+    QVideoFrameFormat m_videoFormat;
     QVideoFrame::MapMode m_mode = QVideoFrame::NotMapped;
     QVariant m_textures;
 #if QT_VERSION < QT_VERSION_CHECK(6, 4, 0)
@@ -473,8 +504,13 @@ QAVVideoFrame::operator QVideoFrame() const
     videoFormat.setColorTransfer(PlanarVideoBuffer::colorTransfer(frame()));
     videoFormat.setColorRange(PlanarVideoBuffer::colorRange(frame()));
     videoFormat.setMaxLuminance(PlanarVideoBuffer::maxNits(frame()));
-#endif
+#endif // #if QT_VERSION >= QT_VERSION_CHECK(6, 4, 0)
+
+#if QT_VERSION < QT_VERSION_CHECK(6, 8, 0)
     return QVideoFrame(new PlanarVideoBuffer(result, format, type), videoFormat);
+#else
+    return QVideoFrame(std::make_unique<PlanarVideoBuffer>(result, format, type, videoFormat));
+#endif
 #endif
 }
 #endif // #ifdef QT_AVPLAYER_MULTIMEDIA

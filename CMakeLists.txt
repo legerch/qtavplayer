@@ -102,6 +102,7 @@ set(PROJECT_HEADERS_PUBLIC
 ### Private
 set(PROJECT_HEADERS_PRIVATE
     qt_internal/qabstractvideobuffer_p.h
+    qt_internal/qhwvideobuffer_p.h
     qt_internal/qvideotexturehelper_p.h
 
     qavcodec_p.h
