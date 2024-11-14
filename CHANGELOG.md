@@ -10,6 +10,7 @@ Creation of the fork library which differ from original by:
 - Remove usage of _Qt private header_ (directly include them)
 - Provide a CMake file which ease integration in other projects
 - Provide a semanctic versionning (which is currently set to `0.0.1`)
+- Use proper Qt logger level (instead of using `qDebug()` everywhere)
 
 <!-- Links -->
 [keep a changelog]: https://keepachangelog.com/en/1.0.0/
