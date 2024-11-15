@@ -20,7 +20,7 @@ QT_BEGIN_NAMESPACE
 
 class QAVIODevice;
 class QAVPlayerPrivate;
-class QAVPlayer : public QObject
+class QTAVPLAYER_EXPORT QAVPlayer : public QObject
 {
     Q_OBJECT
 

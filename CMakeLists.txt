@@ -94,7 +94,6 @@ set(PROJECT_HEADERS_PUBLIC
     qavvideoframe.h
     qavaudioframe.h
     qavsubtitleframe.h
-    qtavplayerglobal.h
     qavstream.h
     qavplayer.h
 )
