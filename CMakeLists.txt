@@ -47,13 +47,16 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 message(STATUS "Project \"${PROJECT_NAME}\" compiled with C++ standard ${CMAKE_CXX_STANDARD}")
 
 # Set needed packages
+## FFmpeg (since Qt also embed his own version of FFmpeg, package must be searched BEFORE Qt)
+find_package(FFMPEG 7.0.0 REQUIRED)
+message(DEBUG "Result after finding FFmpeg package: ${FFMPEG_LIBRARIES} (${FFMPEG_LIBRARY_DIRS})")
+
 ## Qt packages
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Core Gui Multimedia REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core Gui Multimedia REQUIRED)
 
 ## Other library packages
 ### Example: find_package(nlohmann_json 3.11.3 REQUIRED)
-find_package(FFMPEG 7.0.0 REQUIRED)
 
 # Defines useful path variables for easier CMake configuration
 set(PROJECT_DIR_PUBLIC_HEADERS_ROOT "${PROJECT_SOURCE_DIR}/include")
@@ -71,6 +74,12 @@ set(PROJECT_DEF_PRIV
 )
 
 ## Set library linking
+### Linking dirs
+set(PROJECT_LINKING_DIR
+    ${FFMPEG_LIBRARY_DIRS}
+)
+
+### Linking libs
 set(PROJECT_LINKING_LIB
     ### Qt related
     Qt${QT_VERSION_MAJOR}::Core
@@ -252,6 +261,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
                         SOVERSION ${PROJECT_VERSION_MAJOR})
 
 # Link needed libraries
+target_link_directories(${PROJECT_NAME} PRIVATE ${PROJECT_LINKING_DIR})
 target_link_libraries(${PROJECT_NAME} PRIVATE ${PROJECT_LINKING_LIB})
 
 # Specify compiler options

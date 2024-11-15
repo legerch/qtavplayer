@@ -39,15 +39,15 @@ Below, current associated source files of this fork repository:
 ## 1.3. Compatibility
 
 Those symbols will be used:
-- :dizzy:: Untested
+- :dizzy:: Untested (either lack of time, either because unable to access the device to perform tests)
 - :x:: Not working
 - :last_quarter_moon:: Partial support
-- :heavy_check_mark:: Tested and working
+- :white_check_mark:: Tested and working
 
 | / | Qt `5.12 -> 5.15.2` | Qt `6.0 -> 6.8` | HW accelerated feature | Comments |
 |:-:|:-:|:-:|:-:|:-:|
-| Linux (Ubuntu) | :heavy_check_mark: | :heavy_check_mark: | :last_quarter_moon: | HW support:<br>- **Wayland** supported (require packages: `libva-dev`)<br>- **X11** unsupported |
-| Windows | :dizzy: | :dizzy: | :dizzy: | / |
+| Linux (Ubuntu) | :white_check_mark: | :white_check_mark: | :last_quarter_moon: | HW support:<br>- **Wayland** supported (require packages: `libva-dev`)<br>- **X11** unsupported |
+| Windows | :white_check_mark: | :white_check_mark: | :white_check_mark: | / |
 | MacOS | :dizzy: | :dizzy: | :dizzy: | / |
 | iOS | :dizzy: | :dizzy: | :dizzy: | / |
 | Android | :dizzy: | :dizzy: | :dizzy: | / |
