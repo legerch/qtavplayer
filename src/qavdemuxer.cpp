@@ -13,29 +13,39 @@
 #include "qtavplayer/qaviodevice.h"
 #include "qtavplayer/qtavplayer_global.h"
 
-#if defined(QT_AVPLAYER_VA_X11) && QT_CONFIG(opengl)
-#include "qavhwdevice_vaapi_x11_glx_p.h"
-#endif
+#if defined(Q_OS_LINUX)
+#   if defined(QT_AVPLAYER_VA_X11) && QT_CONFIG(opengl)
+#       include "qavhwdevice_vaapi_x11_glx_p.h"
+#       define QAVPLAYER_HW_VA_X11  1
+#   endif
 
-#if defined(QT_AVPLAYER_VA_DRM) && QT_CONFIG(egl)
-#include "qavhwdevice_vaapi_drm_egl_p.h"
-#endif
+#   if defined(QT_AVPLAYER_VA_DRM) && QT_CONFIG(egl)
+#       include "qavhwdevice_vaapi_drm_egl_p.h"
+#       define QAVPLAYER_HW_VA_DRM  1
+#   endif
 
-#if defined(QT_AVPLAYER_VDPAU)
-#include "qavhwdevice_vdpau_p.h"
+#   if defined(QT_AVPLAYER_VDPAU)
+#       include "qavhwdevice_vdpau_p.h"
+#       define QAVPLAYER_HW_VDPAU   1
+#   endif
 #endif
 
 #if defined(Q_OS_MACOS) || defined(Q_OS_IOS)
-#include "qavhwdevice_videotoolbox_p.h"
+#   if defined(QT_AVPLAYER_VTOOLBOX)
+#       include "qavhwdevice_videotoolbox_p.h"
+#       define QAVPLAYER_HW_VTOOLBOX    1
+#   endif
 #endif
 
-#if defined(Q_OS_WIN)
-#include "qavhwdevice_d3d11_p.h"
+#if defined(Q_OS_WIN) && defined(QT_AVPLAYER_D3D11)
+#   include "qavhwdevice_d3d11_p.h"
+#   define  QAVPLAYER_HW_D3D11  1
 #endif
 
-#if defined(Q_OS_ANDROID)
-#include "qavhwdevice_mediacodec_p.h"
-#include <QtCore/private/qjnihelpers_p.h>
+#if defined(Q_OS_ANDROID) && defined(QT_AVPLAYER_MEDIACODEC)
+#   define QAVPLAYER_HW_MEDIACODEC  1
+#   include "qavhwdevice_mediacodec_p.h"
+#   include <QtCore/private/qjnihelpers_p.h>
 extern "C" {
 #include "libavcodec/jni.h"
 }
@@ -181,23 +191,23 @@ static int setup_video_codec(const QString &inputVideoCodec, AVStream *stream, Q
     AVDictionary *opts = NULL;
     Q_UNUSED(opts);
 
-#if defined(QT_AVPLAYER_VA_X11) && QT_CONFIG(opengl)
+#if defined(QAVPLAYER_HW_VA_X11)
     devices.append(QSharedPointer<QAVHWDevice>(new QAVHWDevice_VAAPI_X11_GLX));
     av_dict_set(&opts, "connection_type", "x11", 0);
 #endif
-#if defined(QT_AVPLAYER_VDPAU)
+#if defined(QAVPLAYER_HW_VDPAU)
     devices.append(QSharedPointer<QAVHWDevice>(new QAVHWDevice_VDPAU));
 #endif
-#if defined(QT_AVPLAYER_VA_DRM) && QT_CONFIG(egl)
+#if defined(QAVPLAYER_HW_VA_DRM)
     devices.append(QSharedPointer<QAVHWDevice>(new QAVHWDevice_VAAPI_DRM_EGL));
 #endif
-#if defined(Q_OS_MACOS) || defined(Q_OS_IOS)
+#if defined(QAVPLAYER_HW_VTOOLBOX)
     devices.append(QSharedPointer<QAVHWDevice>(new QAVHWDevice_VideoToolbox));
 #endif
-#if defined(Q_OS_WIN)
+#if defined(QAVPLAYER_HW_D3D11)
     devices.append(QSharedPointer<QAVHWDevice>(new QAVHWDevice_D3D11));
 #endif
-#if defined(Q_OS_ANDROID)
+#if defined(QAVPLAYER_HW_MEDIACODEC)
     devices.append(QSharedPointer<QAVHWDevice>(new QAVHWDevice_MediaCodec));
     if (!codec.codec())
         codec.setCodec(avcodec_find_decoder_by_name("h264_mediacodec"));

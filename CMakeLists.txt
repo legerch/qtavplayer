@@ -182,6 +182,10 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
         set(PROJECT_SOURCES ${PROJECT_SOURCES}
             qavhwdevice_d3d11.cpp
         )
+
+        set(PROJECT_DEF_PRIV ${PROJECT_DEF_PRIV}
+            "QT_AVPLAYER_D3D11"
+        )
     endif()
 endif()
 
@@ -190,6 +194,10 @@ if((CMAKE_SYSTEM_NAME STREQUAL "Darwin" AND QTAVPLAYER_HW_SUPPORT_MACOS) OR (CMA
 
     set(PROJECT_SOURCES ${PROJECT_SOURCES}
         qavhwdevice_videotoolbox.mm
+    )
+
+    set(PROJECT_DEF_PRIV ${PROJECT_DEF_PRIV}
+        "QT_AVPLAYER_VTOOLBOX"
     )
 endif()
 
@@ -221,6 +229,10 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Android" AND QTAVPLAYER_HW_SUPPORT_ANDROID)
     set(PROJECT_SOURCES ${PROJECT_SOURCES}
         qavhwdevice_mediacodec.cpp
         qavandroidsurfacetexture.cpp
+    )
+
+    set(PROJECT_DEF_PRIV ${PROJECT_DEF_PRIV}
+        "QT_AVPLAYER_MEDIACODEC"
     )
 endif()
 
