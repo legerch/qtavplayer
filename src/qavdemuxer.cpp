@@ -11,7 +11,6 @@
 #include "qavsubtitlecodec_p.h"
 #include "qavhwdevice_p.h"
 #include "qtavplayer/qaviodevice.h"
-#include "qtavplayer/qtavplayer_global.h"
 
 #if defined(Q_OS_LINUX)
 #   if defined(QT_AVPLAYER_VA_X11) && QT_CONFIG(opengl)
@@ -67,6 +66,26 @@ extern "C" {
 }
 
 QT_BEGIN_NAMESPACE
+
+namespace {
+
+struct QAVDictionaryHolder
+{
+    AVDictionary *dict = nullptr;
+
+    QAVDictionaryHolder() = default;
+    ~QAVDictionaryHolder()
+    {
+        if (dict) {
+            av_dict_free(&dict);
+        }
+    }
+
+    Q_DISABLE_COPY_MOVE(QAVDictionaryHolder)
+
+};
+
+} // namespace
 
 class QAVDemuxerPrivate
 {
@@ -188,12 +207,12 @@ static int setup_video_codec(const QString &inputVideoCodec, AVStream *stream, Q
         codec.setCodec(videoCodec);
 
     QList<QSharedPointer<QAVHWDevice>> devices;
-    AVDictionary *opts = NULL;
+    QAVDictionaryHolder opts;
     Q_UNUSED(opts);
 
 #if defined(QAVPLAYER_HW_VA_X11)
     devices.append(QSharedPointer<QAVHWDevice>(new QAVHWDevice_VAAPI_X11_GLX));
-    av_dict_set(&opts, "connection_type", "x11", 0);
+    av_dict_set(&opts.dict, "connection_type", "x11", 0);
 #endif
 #if defined(QAVPLAYER_HW_VDPAU)
     devices.append(QSharedPointer<QAVHWDevice>(new QAVHWDevice_VDPAU));
@@ -221,7 +240,7 @@ static int setup_video_codec(const QString &inputVideoCodec, AVStream *stream, Q
         for (auto &device : devices) {
             auto deviceName = av_hwdevice_get_type_name(device->type());
             qDebug() << "Creating hardware device context:" << deviceName;
-            if (av_hwdevice_ctx_create(&hw_device_ctx, device->type(), nullptr, opts, 0) >= 0) {
+            if (av_hwdevice_ctx_create(&hw_device_ctx, device->type(), nullptr, opts.dict, 0) >= 0) {
                 qDebug() << "Using hardware device context:" << deviceName;
                 codec.avctx()->hw_device_ctx = hw_device_ctx;
                 codec.avctx()->pix_fmt = device->format();
@@ -369,11 +388,11 @@ int QAVDemuxer::load(const QString &url, QAVIODevice *dev)
         }
     }
 
-    AVDictionary *opts = nullptr;
+    QAVDictionaryHolder opts;
     for (const auto & key: d->inputOptions.keys())
-        av_dict_set(&opts, key.toUtf8().constData(), d->inputOptions[key].toUtf8().constData(), 0);
+        av_dict_set(&opts.dict, key.toUtf8().constData(), d->inputOptions[key].toUtf8().constData(), 0);
     locker.unlock();
-    int ret = avformat_open_input(&d->ctx, url.toUtf8().constData(), inputFormat, &opts);
+    int ret = avformat_open_input(&d->ctx, url.toUtf8().constData(), inputFormat, &opts.dict);
     if (ret < 0)
         return ret;
 
