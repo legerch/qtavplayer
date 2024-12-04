@@ -94,17 +94,18 @@ set(PROJECT_LINKING_LIB
 ## Set library files
 ### Public interface
 set(PROJECT_HEADERS_PUBLIC
-    qaviodevice.h
+    qavaudioconverter.h
     qavaudioformat.h
+    qavaudioframe.h
     qavaudiooutput.h
     qavaudiooutputdevice.h
-    qavstreamframe.h
     qavframe.h
-    qavvideoframe.h
-    qavaudioframe.h
-    qavsubtitleframe.h
-    qavstream.h
+    qaviodevice.h
     qavplayer.h
+    qavstream.h
+    qavstreamframe.h
+    qavsubtitleframe.h
+    qavvideoframe.h
 )
 
 ### Private
@@ -113,65 +114,66 @@ set(PROJECT_HEADERS_PRIVATE
     qt_internal/qhwvideobuffer_p.h
     qt_internal/qvideotexturehelper_p.h
 
+    qavaudiocodec_p.h
+    qavaudiofilter_p.h
+    qavaudioinputfilter_p.h
+    qavaudiooutputfilter_p.h
     qavcodec_p.h
     qavcodec_p_p.h
-    qavframecodec_p.h
-    qavaudiocodec_p.h
-    qavvideocodec_p.h
-    qavsubtitlecodec_p.h
-    qavhwdevice_p.h
     qavdemuxer_p.h
-    qavpacket_p.h
-    qavstreamframe_p.h
-    qavframe_p.h
-    qavpacketqueue_p.h
-    qavvideobuffer_p.h
-    qavvideobuffer_cpu_p.h
-    qavvideobuffer_gpu_p.h
     qavfilter_p.h
     qavfilter_p_p.h
-    qavvideofilter_p.h
-    qavaudiofilter_p.h
     qavfiltergraph_p.h
+    qavfilters_p.h
+    qavframe_p.h
+    qavframecodec_p.h
+    qavhwdevice_p.h
     qavinoutfilter_p.h
     qavinoutfilter_p_p.h
+    qavpacket_p.h
+    qavpacketqueue_p.h
+    qavstreamframe_p.h
+    qavsubtitlecodec_p.h
+    qavvideobuffer_cpu_p.h
+    qavvideobuffer_gpu_p.h
+    qavvideobuffer_p.h
+    qavvideocodec_p.h
+    qavvideofilter_p.h
     qavvideoinputfilter_p.h
-    qavaudioinputfilter_p.h
     qavvideooutputfilter_p.h
-    qavaudiooutputfilter_p.h
-    qavfilters_p.h
 )
 
 set(PROJECT_SOURCES
-    qavplayer.cpp
-    qavcodec.cpp
-    qavframecodec.cpp
     qavaudiocodec.cpp
-    qavvideocodec.cpp
-    qavsubtitlecodec.cpp
-    qavdemuxer.cpp
-    qavpacket.cpp
-    qavframe.cpp
-    qavstreamframe.cpp
-    qavvideoframe.cpp
+    qavaudioconverter.cpp
+    qavaudiofilter.cpp
     qavaudioframe.cpp
+    qavaudioinputfilter.cpp
     qavaudiooutput.cpp
     qavaudiooutputdevice.cpp
+    qavaudiooutputfilter.cpp
+    qavcodec.cpp
+    qavdemuxer.cpp
+    qavfilter.cpp
+    qavfiltergraph.cpp
+    qavfilters.cpp
+    qavframe.cpp
+    qavframecodec.cpp
+    qavinoutfilter.cpp
+    qaviodevice.cpp
+    qavpacket.cpp
+    qavplayer.cpp
+    qavstream.cpp
+    qavstreamframe.cpp
+    qavsubtitlecodec.cpp
     qavsubtitleframe.cpp
     qavvideobuffer_cpu.cpp
     qavvideobuffer_gpu.cpp
-    qavfilter.cpp
+    qavvideocodec.cpp
     qavvideofilter.cpp
-    qavaudiofilter.cpp
-    qavfiltergraph.cpp
-    qavinoutfilter.cpp
+    qavvideoframe.cpp
     qavvideoinputfilter.cpp
-    qavaudioinputfilter.cpp
     qavvideooutputfilter.cpp
-    qavaudiooutputfilter.cpp
-    qaviodevice.cpp
-    qavstream.cpp
-    qavfilters.cpp
 )
 
 # Manage platform differences
