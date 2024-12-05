@@ -134,11 +134,11 @@ static void log_callback(void *ptr, int level, const char *fmt, va_list vl)
     /* Adapt it to Qt log format */
     switch(level)
     {
-        case AV_LOG_PANIC:
-        case AV_LOG_FATAL:{
+        case AV_LOG_PANIC:{
             qFatal("[ffmpeg] %s", line);
         }break;
-
+        
+        case AV_LOG_FATAL:
         case AV_LOG_ERROR:{
             qCritical("[ffmpeg] %s", line);
         }break;
