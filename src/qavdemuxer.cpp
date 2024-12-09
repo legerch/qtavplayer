@@ -389,8 +389,9 @@ int QAVDemuxer::load(const QString &url, QAVIODevice *dev)
     }
 
     QAVDictionaryHolder opts;
-    for (const auto & key: d->inputOptions.keys())
-        av_dict_set(&opts.dict, key.toUtf8().constData(), d->inputOptions[key].toUtf8().constData(), 0);
+    for(auto itOpts = d->inputOptions.cbegin(); itOpts != d->inputOptions.cend(); ++itOpts){
+        av_dict_set(&opts.dict, itOpts.key().toUtf8().constData(), itOpts.value().toUtf8().constData(), 0);
+    }
     locker.unlock();
     int ret = avformat_open_input(&d->ctx, url.toUtf8().constData(), inputFormat, &opts.dict);
     if (ret < 0)
