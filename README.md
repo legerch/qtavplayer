@@ -14,7 +14,8 @@ Library fork used to provide an _advanced Qt Media Player_ based on [FFmpeg][ffm
 - [3. How to build](#3-how-to-build)
   - [3.1. CMake usage](#31-cmake-usage)
   - [3.2. CMake options](#32-cmake-options)
-- [4. License](#4-license)
+- [4. FFmpeg library usage](#4-ffmpeg-library-usage)
+- [5. License](#5-license)
 
 # 1. Fork details
 ## 1.1. Purposes
@@ -93,7 +94,15 @@ This library provide some **CMake** options:
   - `QTAVPLAYER_HW_SUPPORT_ANDROID`: Support for **Android** using _MediaCodec_ API. **Default value:** `ON`.
   - `QTAVPLAYER_HW_SUPPORT_IOS`: Support for **iOS** using _Metal_ API. **Default value:** `ON`.
 
-# 4. License
+# 4. FFmpeg library usage
+
+FFmpeg documentation is available on [their website][ffmpeg-home] ([and API documentation][ffmpeg-doc-api]).  
+FFmpeg allow to set multiple options through their dictionary:
+- `fflags`: match flags defined under `AVFMT_FLAG_*` values, available at [avformat header API doc][ffmpeg-doc-api-fflags]
+- `flags`: match flags defined under `AV_CODEC_FLAG_*` values, available at [avcodec header API doc][ffmpeg-doc-api-flags]
+- Context options: multiple context structure fields can be set through the dictionary, like `max_delay`, `probesize`, etc.... Available fields can be seen at [AVFormatContext API doc][ffmpeg-doc-api-context]
+
+# 5. License
 
 [QtAvPlayer][qtavplayer-repo] library is released under [MIT License][repo-license], so this library too.
 
@@ -104,6 +113,10 @@ This library provide some **CMake** options:
 <!-- External links -->
 [doxygen-official]: https://www.doxygen.nl/index.html
 [ffmpeg-home]: https://www.ffmpeg.org/
+[ffmpeg-doc-api]: https://ffmpeg.org/doxygen/trunk/index.html
+[ffmpeg-doc-api-context]: https://ffmpeg.org/doxygen/trunk/structAVFormatContext.html
+[ffmpeg-doc-api-flags]: https://www.ffmpeg.org/doxygen/trunk/group__lavc__core.html
+[ffmpeg-doc-api-fflags]: https://www.ffmpeg.org/doxygen/trunk/avformat_8h.html
 [gtest-repo]: https://github.com/google/googletest
 [qtavplayer-repo]: https://github.com/valbok/QtAVPlayer
 
