@@ -129,7 +129,7 @@ public:
                 audioOutput = nullptr;
             }
             if (audioDevice.isNull() || deviceName.toLower() == QLatin1String("null audio device")) {
-                qDebug() << "Audio device is not supported:" << deviceName;
+                qWarning() << "Audio device is not supported:" << deviceName;
                 return;
             }
 

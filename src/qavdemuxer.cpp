@@ -239,9 +239,9 @@ static int setup_video_codec(const QString &inputVideoCodec, AVStream *stream, Q
         AVBufferRef *hw_device_ctx = nullptr;
         for (auto &device : devices) {
             auto deviceName = av_hwdevice_get_type_name(device->type());
-            qDebug() << "Creating hardware device context:" << deviceName;
+            qInfo() << "Creating hardware device context:" << deviceName;
             if (av_hwdevice_ctx_create(&hw_device_ctx, device->type(), nullptr, opts.dict, 0) >= 0) {
-                qDebug() << "Using hardware device context:" << deviceName;
+                qInfo() << "Using hardware device context:" << deviceName;
                 codec.avctx()->hw_device_ctx = hw_device_ctx;
                 codec.avctx()->pix_fmt = device->format();
                 codec.setDevice(device);
@@ -680,7 +680,7 @@ QAVPacket QAVDemuxer::read()
         if (ret == AVERROR_EOF || avio_feof(d->ctx->pb)) {
             eof = true;
         } else {
-            qDebug() << "av_read_frame: unexpected result:" << ret;
+            qWarning() << "av_read_frame: unexpected result:" << ret;
             return {};
         }
     }

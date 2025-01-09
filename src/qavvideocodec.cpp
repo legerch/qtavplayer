@@ -115,9 +115,9 @@ static AVPixelFormat negotiate_pixel_format(AVCodecContext *c, const AVPixelForm
 
     auto dsc = av_pix_fmt_desc_get(pf);
     if (dsc)
-        qDebug() << "Using" << decStr << "decoding in" << dsc->name;
+        qInfo() << "Using" << decStr << "decoding in" << dsc->name;
     else
-        qDebug() << "None of the pixel formats";
+        qInfo() << "None of the pixel formats";
 
     return pf;
 }
