@@ -50,11 +50,12 @@ extern "C" {
 }
 #endif
 
-#include <QDir>
-#include <QSharedPointer>
-#include <QMutexLocker>
 #include <atomic>
-#include <QDebug>
+
+#include <QDir>
+#include <QLoggingCategory>
+#include <QMutexLocker>
+#include <QSharedPointer>
 
 extern "C" {
 #include <libavformat/avformat.h>
@@ -66,6 +67,8 @@ extern "C" {
 }
 
 QT_BEGIN_NAMESPACE
+
+Q_LOGGING_CATEGORY(lcAvBackend, "qtavplayer.backend")
 
 namespace {
 
@@ -135,24 +138,24 @@ static void log_callback(void *ptr, int level, const char *fmt, va_list vl)
     switch(level)
     {
         case AV_LOG_PANIC:{
-            qFatal("[ffmpeg] %s", line);
+            qCFatal(lcAvBackend, "[ffmpeg] %s", line);
         }break;
         
         case AV_LOG_FATAL:
         case AV_LOG_ERROR:{
-            qCritical("[ffmpeg] %s", line);
+            qCCritical(lcAvBackend, "[ffmpeg] %s", line);
         }break;
 
         case AV_LOG_WARNING:{
-            qWarning("[ffmpeg] %s", line);
+            qCWarning(lcAvBackend, "[ffmpeg] %s", line);
         }break;
 
         case AV_LOG_INFO:{
-            qInfo("[ffmpeg] %s", line);
+            qCInfo(lcAvBackend, "[ffmpeg] %s", line);
         }break;
 
         default:{
-            qDebug("[ffmpeg] %s", line);
+            qCDebug(lcAvBackend, "[ffmpeg] %s", line);
         }break;
     }
 }
@@ -239,9 +242,9 @@ static int setup_video_codec(const QString &inputVideoCodec, AVStream *stream, Q
         AVBufferRef *hw_device_ctx = nullptr;
         for (auto &device : devices) {
             auto deviceName = av_hwdevice_get_type_name(device->type());
-            qDebug() << "Creating hardware device context:" << deviceName;
+            qInfo() << "Creating hardware device context:" << deviceName;
             if (av_hwdevice_ctx_create(&hw_device_ctx, device->type(), nullptr, opts.dict, 0) >= 0) {
-                qDebug() << "Using hardware device context:" << deviceName;
+                qInfo() << "Using hardware device context:" << deviceName;
                 codec.avctx()->hw_device_ctx = hw_device_ctx;
                 codec.avctx()->pix_fmt = device->format();
                 codec.setDevice(device);
@@ -680,7 +683,7 @@ QAVPacket QAVDemuxer::read()
         if (ret == AVERROR_EOF || avio_feof(d->ctx->pb)) {
             eof = true;
         } else {
-            qDebug() << "av_read_frame: unexpected result:" << ret;
+            qWarning() << "av_read_frame: unexpected result:" << ret;
             return {};
         }
     }

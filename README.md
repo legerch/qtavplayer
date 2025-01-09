@@ -14,8 +14,10 @@ Library fork used to provide an _advanced Qt Media Player_ based on [FFmpeg][ffm
 - [3. How to build](#3-how-to-build)
   - [3.1. CMake usage](#31-cmake-usage)
   - [3.2. CMake options](#32-cmake-options)
-- [4. FFmpeg library usage](#4-ffmpeg-library-usage)
-- [5. License](#5-license)
+- [4. How to use](#4-how-to-use)
+  - [4.1. Logging category](#41-logging-category)
+- [5. FFmpeg library usage](#5-ffmpeg-library-usage)
+- [6. License](#6-license)
 
 # 1. Fork details
 ## 1.1. Purposes
@@ -94,7 +96,26 @@ This library provide some **CMake** options:
   - `QTAVPLAYER_HW_SUPPORT_ANDROID`: Support for **Android** using _MediaCodec_ API. **Default value:** `ON`.
   - `QTAVPLAYER_HW_SUPPORT_IOS`: Support for **iOS** using _Metal_ API. **Default value:** `ON`.
 
-# 4. FFmpeg library usage
+# 4. How to use
+## 4.1. Logging category
+
+Some classes have more fine-grained logging category:
+- **Player backend** (which is _FFmpeg_): `qtavplayer.backend`
+- **QAVPlayer:** `qtavplayer.player`
+- **QAVVideoCodec:** `"qtavplayer.videocodec"`
+
+Then we can enable/disable logs for those by using [QLoggingCategory][qt-doc-qlogging] appropriate method:
+```cpp
+// Manage Qt logging category
+QLoggingCategory::setFilterRules(QStringLiteral(
+    "qtavplayer.backend.*=true\n"           // Enable all logging level for "backend" category
+    "qtavplayer.player.debug=false\n"       // Disable debug logging, all others are enabled
+    "qtavplayer.videocodec.debug=false\n"
+    "qtavplayer.videocodec.info=true"
+));
+```
+
+# 5. FFmpeg library usage
 
 FFmpeg documentation is available on [their website][ffmpeg-home] ([and API documentation][ffmpeg-doc-api]).  
 FFmpeg allow to set multiple options through their dictionary:
@@ -102,7 +123,7 @@ FFmpeg allow to set multiple options through their dictionary:
 - `flags`: match flags defined under `AV_CODEC_FLAG_*` values, available at [avcodec header API doc][ffmpeg-doc-api-flags]
 - Context options: multiple context structure fields can be set through the dictionary, like `max_delay`, `probesize`, etc.... Available fields can be seen at [AVFormatContext API doc][ffmpeg-doc-api-context]
 
-# 5. License
+# 6. License
 
 [QtAvPlayer][qtavplayer-repo] library is released under [MIT License][repo-license], so this library too.
 
@@ -119,6 +140,7 @@ FFmpeg allow to set multiple options through their dictionary:
 [ffmpeg-doc-api-fflags]: https://www.ffmpeg.org/doxygen/trunk/avformat_8h.html
 [gtest-repo]: https://github.com/google/googletest
 [qtavplayer-repo]: https://github.com/valbok/QtAVPlayer
+[qt-doc-qlogging]: https://doc.qt.io/qt-6/qloggingcategory.html
 
 [qt-official]: https://www.qt.io/
 [qt-installer]: https://www.qt.io/download-qt-installer
