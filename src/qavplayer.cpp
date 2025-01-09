@@ -16,7 +16,7 @@
 #include "qavfiltergraph_p.h"
 #include "qavfilters_p.h"
 
-#include <QtConcurrent/qtconcurrentrun.h>
+#include <QtConcurrent/QtConcurrent>
 #include <QLoggingCategory>
 #include <functional>
 
@@ -26,7 +26,7 @@ extern "C" {
 
 QT_BEGIN_NAMESPACE
 
-Q_LOGGING_CATEGORY(lcAVPlayer, "qt.QtAVPlayer")
+Q_LOGGING_CATEGORY(lcAvPlayer, "qtavplayer.player")
 
 enum PendingMediaStatus
 {
@@ -183,7 +183,7 @@ void QAVPlayerPrivate::setMediaStatus(QAVPlayer::MediaStatus status)
         if (status != QAVPlayer::InvalidMedia)
             error = QAVPlayer::NoError;
 
-        qCDebug(lcAVPlayer) << __FUNCTION__ << ":" << mediaStatus << "->" << status;
+        qCDebug(lcAvPlayer) << QTAVPLAYER_FCTNAME << ":" << mediaStatus << "->" << status;
         mediaStatus = status;
     }
 
@@ -193,7 +193,7 @@ void QAVPlayerPrivate::setMediaStatus(QAVPlayer::MediaStatus status)
 void QAVPlayerPrivate::resetPendingStatuses()
 {
     QMutexLocker locker(&stateMutex);
-    qCDebug(lcAVPlayer) << __FUNCTION__ << ":" << pendingMediaStatuses;
+    qCDebug(lcAvPlayer) << QTAVPLAYER_FCTNAME << ":" << pendingMediaStatuses;
     pendingMediaStatuses.clear();
     wait(true);
 }
@@ -202,7 +202,7 @@ void QAVPlayerPrivate::setPendingMediaStatus(PendingMediaStatus status)
 {
     QMutexLocker locker(&stateMutex);
     pendingMediaStatuses.push_back(status);
-    qCDebug(lcAVPlayer) << __FUNCTION__ << ":" << mediaStatus << "->" << pendingMediaStatuses;
+    qCDebug(lcAvPlayer) << QTAVPLAYER_FCTNAME << ":" << mediaStatus << "->" << pendingMediaStatuses;
 }
 
 bool QAVPlayerPrivate::setState(QAVPlayer::State s)
@@ -214,7 +214,7 @@ bool QAVPlayerPrivate::setState(QAVPlayer::State s)
         if (state == s)
             return result;
 
-        qCDebug(lcAVPlayer) << __FUNCTION__ << ":" << state << "->" << s;
+        qCDebug(lcAvPlayer) << QTAVPLAYER_FCTNAME << ":" << state << "->" << s;
         state = s;
         result = true;
     }
@@ -229,7 +229,7 @@ void QAVPlayerPrivate::setSeekable(bool s)
     if (seekable == s)
         return;
 
-    qCDebug(lcAVPlayer) << __FUNCTION__ << ":" << seekable << "->" << s;
+    qCDebug(lcAvPlayer) << QTAVPLAYER_FCTNAME << ":" << seekable << "->" << s;
     seekable = s;
     Q_EMIT q->seekableChanged(seekable);
 }
@@ -240,7 +240,7 @@ void QAVPlayerPrivate::setDuration(double d)
     if (qFuzzyCompare(duration, d))
         return;
 
-    qCDebug(lcAVPlayer) << __FUNCTION__ << ":" << duration << "->" << d;
+    qCDebug(lcAvPlayer) << QTAVPLAYER_FCTNAME << ":" << duration << "->" << d;
     duration = d;
     Q_EMIT q->durationChanged(q->duration());
 }
@@ -269,7 +269,7 @@ void QAVPlayerPrivate::setVideoFrameRate(double v)
     if (qFuzzyCompare(videoFrameRate, v))
         return;
 
-    qCDebug(lcAVPlayer) << __FUNCTION__ << ":" << videoFrameRate << "->" << v;
+    qCDebug(lcAvPlayer) << QTAVPLAYER_FCTNAME << ":" << videoFrameRate << "->" << v;
     videoFrameRate = v;
     Q_EMIT q->videoFrameRateChanged(v);
 }
@@ -310,7 +310,7 @@ void QAVPlayerPrivate::setError(QAVPlayer::Error err, const QString &str)
 
 void QAVPlayerPrivate::terminate()
 {
-    qCDebug(lcAVPlayer) << __FUNCTION__;
+    qCDebug(lcAvPlayer) << QTAVPLAYER_FCTNAME;
     setState(QAVPlayer::StoppedState);
     quit = true;
     wait(false);
@@ -360,7 +360,7 @@ void QAVPlayerPrivate::step(bool hasFrame)
         locker.relock();
         if (!pendingMediaStatuses.isEmpty()) {
             pendingMediaStatuses.removeFirst();
-            qCDebug(lcAVPlayer) << "Step done:" << status << ", pending" << pendingMediaStatuses;
+            qCDebug(lcAvPlayer) << "Step done:" << status << ", pending" << pendingMediaStatuses;
         }
     }
 
@@ -381,7 +381,7 @@ bool QAVPlayerPrivate::doStep(PendingMediaStatus status, bool hasFrame)
         case PlayingMedia:
             if (valid) {
                 result = true;
-                qCDebug(lcAVPlayer) << "Played from pos:" << q_ptr->position();
+                qCDebug(lcAvPlayer) << "Played from pos:" << q_ptr->position();
                 Q_EMIT q_ptr->played(q_ptr->position());
                 wait(false);
             }
@@ -390,7 +390,7 @@ bool QAVPlayerPrivate::doStep(PendingMediaStatus status, bool hasFrame)
         case PausingMedia:
             if (valid) {
                 result = true;
-                qCDebug(lcAVPlayer) << "Paused to pos:" << q_ptr->position();
+                qCDebug(lcAvPlayer) << "Paused to pos:" << q_ptr->position();
                 Q_EMIT q_ptr->paused(q_ptr->position());
                 wait(true);
             }
@@ -401,7 +401,7 @@ bool QAVPlayerPrivate::doStep(PendingMediaStatus status, bool hasFrame)
                 result = true;
                 if (q_ptr->mediaStatus() == QAVPlayer::EndOfMedia)
                     setMediaStatus(QAVPlayer::LoadedMedia);
-                qCDebug(lcAVPlayer) << "Seeked to pos:" << q_ptr->position();
+                qCDebug(lcAvPlayer) << "Seeked to pos:" << q_ptr->position();
                 Q_EMIT q_ptr->seeked(q_ptr->position());
                 QAVPlayer::State currState = q_ptr->state();
                 if (currState == QAVPlayer::PausedState || currState == QAVPlayer::StoppedState)
@@ -412,7 +412,7 @@ bool QAVPlayerPrivate::doStep(PendingMediaStatus status, bool hasFrame)
         case StoppingMedia:
             if (q_ptr->mediaStatus() != QAVPlayer::NoMedia) {
                 result = true;
-                qCDebug(lcAVPlayer) << "Stopped to pos:" << q_ptr->position();
+                qCDebug(lcAvPlayer) << "Stopped to pos:" << q_ptr->position();
                 Q_EMIT q_ptr->stopped(q_ptr->position());
                 wait(true);
             }
@@ -422,7 +422,7 @@ bool QAVPlayerPrivate::doStep(PendingMediaStatus status, bool hasFrame)
             result = isEndOfFile();
             if (valid) {
                 result = true;
-                qCDebug(lcAVPlayer) << "Stepped to pos:" << q_ptr->position();
+                qCDebug(lcAvPlayer) << "Stepped to pos:" << q_ptr->position();
                 Q_EMIT q_ptr->stepped(q_ptr->position());
                 wait(true);
             }
@@ -452,7 +452,7 @@ bool QAVPlayerPrivate::doStep(PendingMediaStatus status, bool hasFrame)
         && !isSeeking())
     {
         result = true;
-        qCDebug(lcAVPlayer) << __FUNCTION__ << ": EndOfMedia -> skipping:" << status;
+        qCDebug(lcAvPlayer) << QTAVPLAYER_FCTNAME << ": EndOfMedia -> skipping:" << status;
     }
 
     return result;
@@ -470,7 +470,7 @@ void QAVPlayerPrivate::wait(bool v)
     {
         QMutexLocker locker(&waitMutex);
         if (isWaiting != v)
-            qCDebug(lcAVPlayer) << __FUNCTION__ << ":" << isWaiting << "->" << v;
+            qCDebug(lcAvPlayer) << QTAVPLAYER_FCTNAME << ":" << isWaiting << "->" << v;
         isWaiting = v;
     }
 
@@ -492,7 +492,7 @@ void QAVPlayerPrivate::applyFilters(bool reset, const QAVFrame &frame)
 {
     if ((filterDescs == filters.filterDescs()) && !reset)
         return;
-    qCDebug(lcAVPlayer) << __FUNCTION__ << ":" << filters.filterDescs() << "->" << filterDescs << "reset:" << reset;
+    qCDebug(lcAvPlayer) << QTAVPLAYER_FCTNAME << ":" << filters.filterDescs() << "->" << filterDescs << "reset:" << reset;
     int ret = filters.createFilters(filterDescs, frame, demuxer);
     if (ret < 0) {
         setError(QAVPlayer::FilterError, QLatin1String("Could not create filters: ") + err_str(ret));
@@ -521,7 +521,7 @@ void QAVPlayerPrivate::doLoad()
 
     applyFilters(true, {});
     dispatch([this]() -> void {
-        qCDebug(lcAVPlayer) << "[" << url << "]: Loaded, seekable:" << demuxer.seekable() << ", duration:" << demuxer.duration();
+        qCDebug(lcAvPlayer) << "[" << url << "]: Loaded, seekable:" << demuxer.seekable() << ", duration:" << demuxer.duration();
         setSeekable(demuxer.seekable());
         setDuration(demuxer.duration());
         setVideoFrameRate(demuxer.videoFrameRate());
@@ -545,7 +545,7 @@ void QAVPlayerPrivate::doLoad()
     if (!q_ptr->availableSubtitleStreams().isEmpty())
         subtitlePlayFuture = QtConcurrent::run(&threadPool, &QAVPlayerPrivate::doPlaySubtitle, this);
 #endif
-    qCDebug(lcAVPlayer) << __FUNCTION__ << "finished";
+    qCDebug(lcAvPlayer) << QTAVPLAYER_FCTNAME << "finished";
 }
 
 void QAVPlayerPrivate::doDemux()
@@ -573,23 +573,23 @@ void QAVPlayerPrivate::doDemux()
                     pendingPosition = 0;
                 const double pos = pendingPosition;
                 locker.unlock();
-                qCDebug(lcAVPlayer) << "Seeking to pos:" << pos * 1000;
+                qCDebug(lcAvPlayer) << "Seeking to pos:" << pos * 1000;
                 int ret = demuxer.seek(pos);
                 if (ret >= 0) {
-                    qCDebug(lcAVPlayer) << "Waiting video thread finished processing packets";
+                    qCDebug(lcAvPlayer) << "Waiting video thread finished processing packets";
                     videoQueue.waitForEmpty();
                     videoClock.clear();
-                    qCDebug(lcAVPlayer) << "Waiting audio thread finished processing packets";
+                    qCDebug(lcAvPlayer) << "Waiting audio thread finished processing packets";
                     audioQueue.waitForEmpty();
                     audioClock.clear();
-                    qCDebug(lcAVPlayer) << "Waiting subtitle thread finished processing packets";
+                    qCDebug(lcAvPlayer) << "Waiting subtitle thread finished processing packets";
                     subtitleQueue.waitForEmpty();
                     subtitleClock.clear();
-                    qCDebug(lcAVPlayer) << "Flush codec buffers";
+                    qCDebug(lcAvPlayer) << "Flush codec buffers";
                     demuxer.flushCodecBuffers();
-                    qCDebug(lcAVPlayer) << "Reset filters";
+                    qCDebug(lcAvPlayer) << "Reset filters";
                     applyFilters(true, {});
-                    qCDebug(lcAVPlayer) << "Start reading packets from" << pos * 1000;
+                    qCDebug(lcAvPlayer) << "Start reading packets from" << pos * 1000;
                 } else {
                     qWarning() << "Could not seek:" << ret << ":" << err_str(ret);
                 }
@@ -626,7 +626,7 @@ void QAVPlayerPrivate::doDemux()
             {
                 filters.flush();
                 endOfFile(true);
-                qCDebug(lcAVPlayer) << "EndOfMedia";
+                qCDebug(lcAvPlayer) << "EndOfMedia";
                 setPendingMediaStatus(EndOfMedia);
                 q_ptr->stop();
                 wait(false);
@@ -636,7 +636,7 @@ void QAVPlayerPrivate::doDemux()
             waiter.wait(&waiterMutex, 10);
         }
     }
-    qCDebug(lcAVPlayer) << __FUNCTION__ << "finished";
+    qCDebug(lcAvPlayer) << QTAVPLAYER_FCTNAME << "finished";
 }
 
 static double streamDuration(const QAVStreamFrame &frame, const QAVDemuxer &demuxer)
@@ -685,7 +685,7 @@ bool QAVPlayerPrivate::skipFrame(
         result = pos < requestedPos && !isQueueEOF && !lastFrame;
         if (master) {
             if (result)
-                qCDebug(lcAVPlayer) << __FUNCTION__ << pos << "<" << requestedPos;
+                qCDebug(lcAvPlayer) << QTAVPLAYER_FCTNAME << pos << "<" << requestedPos;
             else
                 pendingPosition = 0;
         }
@@ -782,7 +782,7 @@ void QAVPlayerPrivate::doPlayVideo()
     videoQueue.clear();
     videoClock.clear();
     setMediaStatus(QAVPlayer::NoMedia);
-    qCDebug(lcAVPlayer) << __FUNCTION__ << "finished";
+    qCDebug(lcAvPlayer) << QTAVPLAYER_FCTNAME << "finished";
 }
 
 void QAVPlayerPrivate::doPlayAudio()
@@ -809,7 +809,7 @@ void QAVPlayerPrivate::doPlayAudio()
     audioClock.clear();
     if (master)
         setMediaStatus(QAVPlayer::NoMedia);
-    qCDebug(lcAVPlayer) << __FUNCTION__ << "finished";
+    qCDebug(lcAvPlayer) << QTAVPLAYER_FCTNAME << "finished";
 }
 
 void QAVPlayerPrivate::doPlayStep(
@@ -855,7 +855,7 @@ void QAVPlayerPrivate::doPlaySubtitle()
 
     subtitleQueue.clear();
     subtitleClock.clear();
-    qCDebug(lcAVPlayer) << __FUNCTION__ << "finished";
+    qCDebug(lcAvPlayer) << QTAVPLAYER_FCTNAME << "finished";
 }
 
 QAVPlayer::QAVPlayer(QObject *parent)
@@ -883,7 +883,7 @@ void QAVPlayer::setSource(const QString &url, const QSharedPointer<QAVIODevice> 
     if (d->url == url)
         return;
 
-    qCDebug(lcAVPlayer) << __FUNCTION__ << ":" << url;
+    qCDebug(lcAvPlayer) << QTAVPLAYER_FCTNAME << ":" << url;
 
     d->terminate();
     d->url = url;
@@ -925,7 +925,7 @@ void QAVPlayer::setVideoStream(const QAVStream &stream)
     Q_D(QAVPlayer);
     if (d->demuxer.currentVideoStreams() == QList<QAVStream>({stream}))
         return;
-    qCDebug(lcAVPlayer) << __FUNCTION__ << ":" << d->demuxer.currentVideoStreams() << "->" << stream.index();
+    qCDebug(lcAvPlayer) << QTAVPLAYER_FCTNAME << ":" << d->demuxer.currentVideoStreams() << "->" << stream.index();
     if (d->demuxer.setVideoStreams({stream}))
         Q_EMIT videoStreamsChanged(d->demuxer.currentVideoStreams());
 }
@@ -935,7 +935,7 @@ void QAVPlayer::setVideoStreams(const QList<QAVStream> &streams)
     Q_D(QAVPlayer);
     if (d->demuxer.currentVideoStreams() == streams)
         return;
-    qCDebug(lcAVPlayer) << __FUNCTION__ << ":" << d->demuxer.currentVideoStreams() << "->" << streams;
+    qCDebug(lcAvPlayer) << QTAVPLAYER_FCTNAME << ":" << d->demuxer.currentVideoStreams() << "->" << streams;
     if (d->demuxer.setVideoStreams(streams))
         Q_EMIT videoStreamsChanged(d->demuxer.currentVideoStreams());
 }
@@ -957,7 +957,7 @@ void QAVPlayer::setAudioStream(const QAVStream &stream)
     Q_D(QAVPlayer);
     if (d->demuxer.currentAudioStreams() == QList<QAVStream>({stream}))
         return;
-    qCDebug(lcAVPlayer) << __FUNCTION__ << ":" << d->demuxer.currentAudioStreams() << "->" << stream.index();
+    qCDebug(lcAvPlayer) << QTAVPLAYER_FCTNAME << ":" << d->demuxer.currentAudioStreams() << "->" << stream.index();
     if (d->demuxer.setAudioStreams({stream}))
         Q_EMIT audioStreamsChanged(d->demuxer.currentAudioStreams());
 }
@@ -967,7 +967,7 @@ void QAVPlayer::setAudioStreams(const QList<QAVStream> &streams)
     Q_D(QAVPlayer);
     if (d->demuxer.currentAudioStreams() == streams)
         return;
-    qCDebug(lcAVPlayer) << __FUNCTION__ << ":" << d->demuxer.currentAudioStreams() << "->" << streams;
+    qCDebug(lcAvPlayer) << QTAVPLAYER_FCTNAME << ":" << d->demuxer.currentAudioStreams() << "->" << streams;
     if (d->demuxer.setAudioStreams(streams))
         Q_EMIT audioStreamsChanged(d->demuxer.currentAudioStreams());
 }
@@ -989,7 +989,7 @@ void QAVPlayer::setSubtitleStream(const QAVStream &stream)
     Q_D(QAVPlayer);
     if (d->demuxer.currentSubtitleStreams() == QList<QAVStream>({stream}))
         return;
-    qCDebug(lcAVPlayer) << __FUNCTION__ << ":" << d->demuxer.currentSubtitleStreams() << "->" << stream.index();
+    qCDebug(lcAvPlayer) << QTAVPLAYER_FCTNAME << ":" << d->demuxer.currentSubtitleStreams() << "->" << stream.index();
     if (d->demuxer.setSubtitleStreams({stream}))
         Q_EMIT subtitleStreamsChanged(d->demuxer.currentSubtitleStreams());
 }
@@ -999,7 +999,7 @@ void QAVPlayer::setSubtitleStreams(const QList<QAVStream> &streams)
     Q_D(QAVPlayer);
     if (d->demuxer.currentSubtitleStreams() == streams)
         return;
-    qCDebug(lcAVPlayer) << __FUNCTION__ << ":" << d->demuxer.currentSubtitleStreams() << "->" << streams;
+    qCDebug(lcAvPlayer) << QTAVPLAYER_FCTNAME << ":" << d->demuxer.currentSubtitleStreams() << "->" << streams;
     if (d->demuxer.setSubtitleStreams(streams))
         Q_EMIT subtitleStreamsChanged(d->demuxer.currentSubtitleStreams());
 }
@@ -1024,10 +1024,10 @@ void QAVPlayer::play()
     if (d->url.isEmpty() || d->currentError() == QAVPlayer::ResourceError)
         return;
 
-    qCDebug(lcAVPlayer) << __FUNCTION__;
+    qCDebug(lcAvPlayer) << QTAVPLAYER_FCTNAME;
     if (d->setState(QAVPlayer::PlayingState)) {
         if (d->isEndOfFile()) {
-            qCDebug(lcAVPlayer) << "Playing from beginning";
+            qCDebug(lcAvPlayer) << "Playing from beginning";
             seek(0);
         }
         d->setPendingMediaStatus(PlayingMedia);
@@ -1043,10 +1043,10 @@ void QAVPlayer::pause()
     if (d->currentError() == QAVPlayer::ResourceError)
         return;
 
-    qCDebug(lcAVPlayer) << __FUNCTION__;
+    qCDebug(lcAvPlayer) << QTAVPLAYER_FCTNAME;
     if (d->setState(QAVPlayer::PausedState)) {
         if (d->isEndOfFile()) {
-            qCDebug(lcAVPlayer) << "Pausing from beginning";
+            qCDebug(lcAvPlayer) << "Pausing from beginning";
             seek(0);
         }
         d->setPendingMediaStatus(PausingMedia);
@@ -1064,7 +1064,7 @@ void QAVPlayer::stop()
     if (d->currentError() == QAVPlayer::ResourceError)
         return;
 
-    qCDebug(lcAVPlayer) << __FUNCTION__;
+    qCDebug(lcAvPlayer) << QTAVPLAYER_FCTNAME;
     if (d->setState(QAVPlayer::StoppedState)) {
         d->setPendingMediaStatus(StoppingMedia);
         d->wait(false);
@@ -1081,10 +1081,10 @@ void QAVPlayer::stepForward()
     if (d->currentError() == QAVPlayer::ResourceError)
         return;
 
-    qCDebug(lcAVPlayer) << __FUNCTION__;
+    qCDebug(lcAvPlayer) << QTAVPLAYER_FCTNAME;
     d->setState(QAVPlayer::PausedState);
     if (d->isEndOfFile()) {
-        qCDebug(lcAVPlayer) << "Stepping from beginning";
+        qCDebug(lcAvPlayer) << "Stepping from beginning";
         seek(0);
     }
     d->setPendingMediaStatus(SteppingMedia);
@@ -1099,7 +1099,7 @@ void QAVPlayer::stepBackward()
     if (d->currentError() == QAVPlayer::ResourceError)
         return;
 
-    qCDebug(lcAVPlayer) << __FUNCTION__;
+    qCDebug(lcAvPlayer) << QTAVPLAYER_FCTNAME;
     d->setState(QAVPlayer::PausedState);
     const qint64 pos = d->pts() > 0 ? (d->pts() - videoFrameRate()) * 1000 : duration();
     seek(pos);
@@ -1120,7 +1120,7 @@ void QAVPlayer::seek(qint64 pos)
     if ((duration() > 0 && pos > duration()) || d->currentError() == QAVPlayer::ResourceError)
         return;
 
-    qCDebug(lcAVPlayer) << __FUNCTION__ << ":" << "pos:" << pos;
+    qCDebug(lcAvPlayer) << QTAVPLAYER_FCTNAME << ":" << "pos:" << pos;
     {
         QMutexLocker locker(&d->positionMutex);
         d->pendingSeek = true;
@@ -1163,7 +1163,7 @@ void QAVPlayer::setSpeed(qreal r)
         if (qFuzzyCompare(d->speed, r))
             return;
 
-        qCDebug(lcAVPlayer) << __FUNCTION__ << ":" << d->speed << "->" << r;
+        qCDebug(lcAvPlayer) << QTAVPLAYER_FCTNAME << ":" << d->speed << "->" << r;
         d->speed = r;
     }
     Q_EMIT speedChanged(r);
@@ -1190,7 +1190,7 @@ void QAVPlayer::setFilter(const QString &desc)
         if (d->filterDescs.size() == 1 && d->filterDescs.front() == desc)
             return;
 
-        qCDebug(lcAVPlayer) << __FUNCTION__ << ":" << d->filterDescs << "->" << desc;
+        qCDebug(lcAvPlayer) << QTAVPLAYER_FCTNAME << ":" << d->filterDescs << "->" << desc;
         if (desc.isEmpty())
             d->filterDescs.clear();
         else
@@ -1207,7 +1207,7 @@ void QAVPlayer::setFilters(const QList<QString> &filters)
     Q_D(QAVPlayer);
     {
         QMutexLocker locker(&d->stateMutex);
-        qCDebug(lcAVPlayer) << __FUNCTION__ << ":" << d->filterDescs << "->" << filters;
+        qCDebug(lcAvPlayer) << QTAVPLAYER_FCTNAME << ":" << d->filterDescs << "->" << filters;
         d->filterDescs = filters;
     }
 
@@ -1230,7 +1230,7 @@ void QAVPlayer::setBitstreamFilter(const QString &desc)
     if (bsf == desc)
         return;
 
-    qCDebug(lcAVPlayer) << __FUNCTION__ << ":" << bsf << "->" << desc;
+    qCDebug(lcAvPlayer) << QTAVPLAYER_FCTNAME << ":" << bsf << "->" << desc;
     int ret = d->demuxer.applyBitstreamFilter(desc);
     Q_EMIT bitstreamFilterChanged(desc);
     if (ret < 0)
@@ -1272,7 +1272,7 @@ void QAVPlayer::setInputFormat(const QString &format)
     if (format == current)
         return;
 
-    qCDebug(lcAVPlayer) << __FUNCTION__ << ":" << current << "->" << format;
+    qCDebug(lcAvPlayer) << QTAVPLAYER_FCTNAME << ":" << current << "->" << format;
     d->demuxer.setInputFormat(format);
     Q_EMIT inputFormatChanged(format);
 }
@@ -1290,7 +1290,7 @@ void QAVPlayer::setInputVideoCodec(const QString &codec)
     if (codec == current)
         return;
 
-    qCDebug(lcAVPlayer) << __FUNCTION__ << ":" << current << "->" << codec;
+    qCDebug(lcAvPlayer) << QTAVPLAYER_FCTNAME << ":" << current << "->" << codec;
     d->demuxer.setInputVideoCodec(codec);
     Q_EMIT inputVideoCodecChanged(codec);
 }
@@ -1313,7 +1313,7 @@ void QAVPlayer::setInputOptions(const QMap<QString, QString>  &opts)
     if (opts == current)
         return;
 
-    qCDebug(lcAVPlayer) << __FUNCTION__ << ":" << current << "->" << opts;
+    qCDebug(lcAvPlayer) << QTAVPLAYER_FCTNAME << ":" << current << "->" << opts;
     d->demuxer.setInputOptions(opts);
     Q_EMIT inputOptionsChanged(opts);
 }
