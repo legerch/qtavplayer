@@ -334,7 +334,9 @@ void QAVPlayerPrivate::terminate()
     loaderFuture.waitForFinished();
     videoPlayFuture.waitForFinished();
     audioPlayFuture.waitForFinished();
-
+    videoQueue.abort(false);
+    audioQueue.abort(false);
+    subtitleQueue.abort(false);
     demuxer.abort(false);
 
     pendingPosition = 0;
