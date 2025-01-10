@@ -37,7 +37,7 @@ Below, current associated source files of this fork repository:
 
 | QtAvPlayer | Qt internal files |
 |:-:|:-:|
-| [746db8051b0c0d687bc2148308f7761e91ec3f98](https://github.com/valbok/QtAVPlayer/commit/746db8051b0c0d687bc2148308f7761e91ec3f98) | [Qt 6.8.0](https://github.com/qt/qtmultimedia/tree/6.7.2/src/multimedia/video) |
+| [ea5be8e1813f417b43f69c5872f9036c2144ba39](https://github.com/valbok/QtAVPlayer/commit/ea5be8e1813f417b43f69c5872f9036c2144ba39) | [Qt 6.8.0](https://github.com/qt/qtmultimedia/tree/6.8.0/src/multimedia/video) |
 
 ## 1.3. Compatibility
 
