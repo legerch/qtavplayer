@@ -139,7 +139,11 @@ static void log_callback(void *ptr, int level, const char *fmt, va_list vl)
     switch(level)
     {
         case AV_LOG_PANIC:{
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
             qCFatal(lcAvBackend, "[ffmpeg] %s", line);
+#else
+            qFatal("[ffmpeg] %s", line);
+#endif
         }break;
         
         case AV_LOG_FATAL:
