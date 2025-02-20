@@ -210,6 +210,15 @@ if((CMAKE_SYSTEM_NAME STREQUAL "Darwin" AND QTAVPLAYER_HW_SUPPORT_MACOS) OR (CMA
     set(PROJECT_DEF_PRIV ${PROJECT_DEF_PRIV}
         "QT_AVPLAYER_VTOOLBOX"
     )
+
+    find_library(COREVIDEO_FRAMEWORK CoreVideo)
+    find_library(IOSURFACE_FRAMEWORK IOSurface)
+    find_library(METAL_FRAMEWORK Metal)
+    set(PROJECT_LINKING_LIB ${PROJECT_LINKING_LIB}
+        ${COREVIDEO_FRAMEWORK}
+        ${IOSURFACE_FRAMEWORK}
+        ${METAL_FRAMEWORK}
+    )
 endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND QTAVPLAYER_HW_SUPPORT_LINUX_WAYLAND)
@@ -294,4 +303,7 @@ target_include_directories(${PROJECT_NAME}
 # Add linker specific flags due to FFMPEG.
 # For more details, please refer to:
 # https://github.com/microsoft/vcpkg/issues/31185
-set(CMAKE_SHARED_LINKER_FLAGS "-Wl,-Bsymbolic")
+if(NOT APPLE)
+    set(CMAKE_SHARED_LINKER_FLAGS "-Wl,-Bsymbolic")
+endif()
+
