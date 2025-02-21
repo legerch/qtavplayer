@@ -22,11 +22,9 @@ Library fork used to provide an _advanced Qt Media Player_ based on [FFmpeg][ffm
 # 1. Fork details
 ## 1.1. Purposes
 
-Original library was hard to build due to:
-- Usage of _Qt private headers_ (which heavily depends on how Qt was installed and the version used)
-- Some _CMake hacks_ (source directory had to be set manually, some directories where includes and exported when building target)
+The fork is mainly due to the library being hard to build on mainline version due to multiple _CMake hacks:_ source directory had to be set manually, some directories where includes and exported when building target
 
-So this fork aim to mainly fix those issues (and try some "workaround" to later propose a pull request to the original repository)
+So this fork aim to mainly fix this issue (and try some "workaround" to later propose a pull request to the original repository)
 
 > [!TIP]
 > See [changelog][repo-changelog] for more details
@@ -35,9 +33,9 @@ So this fork aim to mainly fix those issues (and try some "workaround" to later 
 
 Below, current associated source files of this fork repository:
 
-| QtAvPlayer | Qt internal files |
-|:-:|:-:|
-| [ea5be8e1813f417b43f69c5872f9036c2144ba39](https://github.com/valbok/QtAVPlayer/commit/ea5be8e1813f417b43f69c5872f9036c2144ba39) | [Qt 6.8.0](https://github.com/qt/qtmultimedia/tree/6.8.0/src/multimedia/video) |
+| QtAvPlayer |
+|:-:|
+| [ea5be8e1813f417b43f69c5872f9036c2144ba39](https://github.com/valbok/QtAVPlayer/commit/ea5be8e1813f417b43f69c5872f9036c2144ba39) |
 
 ## 1.3. Compatibility
 

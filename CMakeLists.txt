@@ -25,16 +25,6 @@ option(QTAVPLAYER_HW_SUPPORT_LINUX_WAYLAND  "Use to enable/disable hardware acce
 option(QTAVPLAYER_HW_SUPPORT_ANDROID        "Use to enable/disable hardware accelerated support for Android" ON)
 option(QTAVPLAYER_HW_SUPPORT_IOS            "Use to enable/disable hardware accelerated support for iOS" ON)
 
-# Where to export generated binaries
-if(NOT PROJECT_BUILD_OUTPUT)
-    set(PROJECT_BUILD_OUTPUT ${CMAKE_SOURCE_DIR}/build/output/${PROJECT_ARCH_TARGET}/${CMAKE_BUILD_TYPE})
-
-    set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BUILD_OUTPUT}/bin)
-    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BUILD_OUTPUT}/lib)
-    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BUILD_OUTPUT}/lib)
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BUILD_OUTPUT}/bin)
-endif()
-
 # Set C++ standard to use
 if(DEFINED CMAKE_CXX_STANDARD)
     if(${CMAKE_CXX_STANDARD} LESS ${PROJECT_VERSION_CPP_MIN})
@@ -52,8 +42,22 @@ find_package(FFMPEG 7.0.0 REQUIRED)
 message(DEBUG "Result after finding FFmpeg package: ${FFMPEG_LIBRARIES} (${FFMPEG_LIBRARY_DIRS})")
 
 ## Qt packages
+### Search packages
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Core Gui Multimedia REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core Gui Multimedia REQUIRED)
+
+### Find private packages
+if(${QT_VERSION_MAJOR} EQUAL 6)
+    message(STATUS "Project \"${PROJECT_NAME}\" compiled with Qt6 toolchain")
+    set(QT_DIR_PRIV_SOURCES ${Qt6Multimedia_PRIVATE_INCLUDE_DIRS})
+
+elseif(${QT_VERSION_MAJOR} EQUAL 5)
+    message(STATUS "Project \"${PROJECT_NAME}\" compiled with Qt5 toolchain")
+    set(QT_DIR_PRIV_SOURCES ${Qt5Multimedia_PRIVATE_INCLUDE_DIRS})
+
+else()
+    message(FATAL_ERROR "Project ${PROJECT_NAME} only support Qt5 or Qt6 toolchains, found Qt${QT_VERSION_MAJOR} toolchain")
+endif()
 
 ## Other library packages
 ### Example: find_package(nlohmann_json 3.11.3 REQUIRED)
@@ -110,10 +114,6 @@ set(PROJECT_HEADERS_PUBLIC
 
 ### Private
 set(PROJECT_HEADERS_PRIVATE
-    qt_internal/qabstractvideobuffer_p.h
-    qt_internal/qhwvideobuffer_p.h
-    qt_internal/qvideotexturehelper_p.h
-
     qavaudiocodec_p.h
     qavaudiofilter_p.h
     qavaudioinputfilter_p.h
@@ -298,6 +298,7 @@ target_include_directories(${PROJECT_NAME}
     PRIVATE
         ${PROJECT_DIR_PRIV_SOURCES}         # Internal headers, only for internal use
         ${FFMPEG_INCLUDE_DIRS}              # Needed for FFMPEG library
+        ${QT_DIR_PRIV_SOURCES}              # Private Qt headers
 )
 
 # Add linker specific flags due to FFMPEG.

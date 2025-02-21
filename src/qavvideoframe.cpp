@@ -19,11 +19,11 @@
 #       include <QAbstractVideoSurface>
 #   else
 #       if QT_VERSION < QT_VERSION_CHECK(6, 8, 0)
-#           include <qt_internal/qabstractvideobuffer_p.h>
+#           include <QtMultimedia/private/qabstractvideobuffer_p.h>
 #       else
-#           include <qt_internal/qhwvideobuffer_p.h>
+#           include <QtMultimedia/private/qhwvideobuffer_p.h>
 #       endif
-#       include <qt_internal/qvideotexturehelper_p.h>
+#       include <QtMultimedia/private/qvideotexturehelper_p.h>
 #   endif
 #endif
 
