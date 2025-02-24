@@ -35,7 +35,7 @@ Below, current associated source files of this fork repository:
 
 | QtAvPlayer |
 |:-:|
-| [ea5be8e1813f417b43f69c5872f9036c2144ba39](https://github.com/valbok/QtAVPlayer/commit/ea5be8e1813f417b43f69c5872f9036c2144ba39) |
+| [85fabf70c2959d3d29aff3008696b75d00b2e5c9](https://github.com/valbok/QtAVPlayer/commit/85fabf70c2959d3d29aff3008696b75d00b2e5c9) |
 
 ## 1.3. Compatibility
 
@@ -49,7 +49,7 @@ Those symbols will be used:
 |:-:|:-:|:-:|:-:|:-:|
 | Linux (Ubuntu) | :white_check_mark: | :white_check_mark: | :last_quarter_moon: | HW support:<br>- **Wayland** supported (require packages: `libva-dev`)<br>- **X11** unsupported |
 | Windows | :white_check_mark: | :white_check_mark: | :white_check_mark: | / |
-| MacOS | :dizzy: | :dizzy: | :dizzy: | / |
+| MacOS | :white_check_mark: | :white_check_mark: | :white_check_mark: | / |
 | iOS | :dizzy: | :dizzy: | :dizzy: | / |
 | Android | :dizzy: | :dizzy: | :dizzy: | / |
  
